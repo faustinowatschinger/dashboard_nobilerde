@@ -1,5 +1,5 @@
 // src/services/metricsService.js
-import apiClient from './apiClient.js';
+import apiClient, { apiGet } from './apiClient.js';
 import dayjs from 'dayjs';
 
 /**
@@ -441,6 +441,25 @@ export const metricsService = {
   },
 
   /**
+   * Obtiene tendencias
+   * @param {Object} params
+   * @returns {Promise<Object>} Datos de tendencias
+   */
+  async fetchTrends(params = {}) {
+    try {
+      const data = await apiGet('/api/metrics/trends', params);
+      return {
+        kAnonymityOk: data.kAnonymityOk,
+        sample: data.sample || {},
+        series: Array.isArray(data.series) ? data.series : [],
+        bucket: data.bucket || 'day',
+      };
+    } catch (error) {
+      console.error('Error fetching trends:', error);
+      throw new Error(`Error cargando tendencias: ${error.message}`);
+    }
+  },
+  /**
    * Obtiene estadísticas del cache de métricas
    * @returns {Promise<Object>} Estadísticas del cache
    */
@@ -476,6 +495,7 @@ export const fetchNotesTopWithComparison = metricsService.fetchNotesTopWithCompa
 export const refreshOverview = metricsService.refreshOverview;
 export const fetchFilterOptions = metricsService.fetchFilterOptions;
 export const fetchMarketTrends = metricsService.fetchMarketTrends;
+export const fetchTrends = metricsService.fetchTrends;
 export const fetchFlavorAnalysis = metricsService.fetchFlavorAnalysis;
 export const fetchCacheStats = metricsService.fetchCacheStats;
 export const clearCache = metricsService.clearCache;

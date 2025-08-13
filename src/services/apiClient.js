@@ -122,3 +122,19 @@ class ApiClient {
 const apiClient = new ApiClient();
 
 export default apiClient;
+
+export async function apiGet(path, params = {}) {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      searchParams.append(key, value);
+    }
+  });
+  const query = searchParams.toString();
+  const url = `${API_BASE_URL}${path}${query ? `?${query}` : ''}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Request failed with ${res.status}`);
+  }
+  return res.json();
+}

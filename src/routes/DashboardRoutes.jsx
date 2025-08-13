@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Import de componentes del dashboard
 import OverviewPage from '../dashboard/Overview/OverviewPage.jsx';
+import TrendsPage from '../dashboard/Trends/TrendsPage.jsx';
 
 // Componente PrivateRoute dummy (placeholder)
 const PrivateRoute = ({ children }) => {
@@ -41,7 +42,7 @@ const DashboardRoutes = () => {
         path="/dashboard/market-trends" 
         element={
           <PrivateRoute>
-            <div>Market Trends - Coming Soon</div>
+            <TrendsPage />
           </PrivateRoute>
         } 
       />
