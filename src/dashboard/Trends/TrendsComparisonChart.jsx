@@ -11,7 +11,7 @@ import {
   ReferenceLine,
   Cell
 } from 'recharts';
-import { Box, Typography, useTheme, alpha, Chip } from '@mui/material';
+import { Box, Typography, useTheme, alpha, Chip, Alert } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
 
 const TrendsComparisonChart = ({ trends = [], loading = false }) => {
@@ -143,6 +143,11 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             <Typography variant="caption" color="text.secondary">
               Cambio: <strong>{currentValue - previousValue}</strong>
             </Typography>
+            {tendencyPercent === 0 && currentValue > 0 && (
+              <Typography variant="caption" color="info.main" sx={{ fontStyle: 'italic', mt: 0.5 }}>
+                💡 Sin variación entre períodos
+              </Typography>
+            )}
           </Box>
         </Box>
       );
@@ -180,6 +185,56 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
           </Typography>
         </Typography>
+      </Box>
+    );
+  }
+
+  // Verificar si todos los datos son "sin cambio" (0% de variación)
+  const allDataIsFlat = chartData.every(d => Math.abs(d.tendencyPercent) < 0.1);
+  
+  // Mensaje informativo para cuando hay datos pero sin variación significativa
+  if (allDataIsFlat && chartData.length > 0) {
+    const hasVolumeData = chartData.some(d => d.currentValue > 0 || d.previousValue > 0);
+    
+    return (
+      <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
+        <Alert 
+          severity="info" 
+          sx={{ mb: 2 }}
+          icon={<TrendingFlat />}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+            Datos estables - Sin variación significativa
+          </Typography>
+          <Typography variant="body2">
+            {hasVolumeData 
+              ? 'Las entidades seleccionadas muestran valores estables entre períodos. Esto puede ocurrir cuando hay poca variación en los eventos de la métrica seleccionada.'
+              : 'No se encontraron variaciones significativas en el período seleccionado.'
+            }
+          </Typography>
+          <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+            💡 Sugerencia: Prueba cambiar la métrica o el período para ver más variación en los datos.
+          </Typography>
+        </Alert>
+
+        <ResponsiveContainer width="100%" height={350}>
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="entity" />
+            <YAxis domain={[-1, 1]} tickFormatter={(value) => `${value.toFixed(0)}%`} />
+            <Tooltip content={<CustomTooltip />} />
+            <ReferenceLine y={0} stroke={theme.palette.divider} strokeWidth={2} />
+            
+            <Bar dataKey="tendencyPercent">
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={theme.palette.grey[400]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
       </Box>
     );
   }

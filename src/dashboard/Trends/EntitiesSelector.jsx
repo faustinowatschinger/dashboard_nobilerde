@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Autocomplete, TextField, CircularProgress } from '@mui/material';
+import { Box, FormControl, InputLabel, Select, MenuItem, Autocomplete, TextField, CircularProgress, Typography, Chip } from '@mui/material';
 import metricsService from '../../services/metricsService.js';
 
 const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntitiesChange }) => {
   const [availableEntities, setAvailableEntities] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Información contextual sobre qué esperar de cada tipo de entidad
+  const entityTypeInfo = {
+    tipo: { variationLevel: 'Alta', note: 'Buena variación temporal' },
+    marca: { variationLevel: 'Alta', note: 'Diferencias significativas' },
+    origen: { variationLevel: 'Media', note: 'Variación moderada' },
+    paisProd: { variationLevel: 'Baja', note: 'Descubrimiento estable (100%)' },
+    secado: { variationLevel: 'Media', note: 'Diferencias técnicas' },
+    establecimiento: { variationLevel: 'Baja', note: 'Descubrimiento estable (100%)' },
+    containsPalo: { variationLevel: 'Media', note: 'Preferencias claras' },
+    leafCut: { variationLevel: 'Media', note: 'Características técnicas' },
+    tipoEstacionamiento: { variationLevel: 'Baja', note: 'Descubrimiento estable (100%)' },
+    produccion: { variationLevel: 'Media', note: 'Diferencias de producción' }
+  };
 
   // Cargar entidades disponibles cuando cambia el tipo
   useEffect(() => {
@@ -51,6 +65,24 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
           <MenuItem value="produccion">Producción</MenuItem>
         </Select>
       </FormControl>
+
+      {/* Información contextual sobre el tipo de entidad seleccionado */}
+      {entityType && entityTypeInfo[entityType] && (
+        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+          <Chip 
+            size="small" 
+            label={`Variación: ${entityTypeInfo[entityType].variationLevel}`}
+            color={
+              entityTypeInfo[entityType].variationLevel === 'Alta' ? 'success' :
+              entityTypeInfo[entityType].variationLevel === 'Media' ? 'warning' : 'default'
+            }
+            variant="outlined"
+          />
+          <Typography variant="caption" color="text.secondary">
+            {entityTypeInfo[entityType].note}
+          </Typography>
+        </Box>
+      )}
 
       <Autocomplete
         multiple
