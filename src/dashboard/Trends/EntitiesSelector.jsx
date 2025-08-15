@@ -1,14 +1,30 @@
-import React from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Autocomplete, TextField } from '@mui/material';
-
-const mockOptions = {
-  tipo: ['Tradicional', 'Con palo', 'Sin palo', 'Suave', 'Orgánica'],
-  marca: ['La Merced', 'Taragui', 'Amanda', 'Union', 'Rosamonte'],
-  atributo: ['Intensa', 'Ahumada', 'Dulce', 'Floral'],
-};
+import React, { useState, useEffect } from 'react';
+import { Box, FormControl, InputLabel, Select, MenuItem, Autocomplete, TextField, CircularProgress } from '@mui/material';
+import metricsService from '../../services/metricsService.js';
 
 const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntitiesChange }) => {
-  const options = mockOptions[entityType] || [];
+  const [availableEntities, setAvailableEntities] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Cargar entidades disponibles cuando cambia el tipo
+  useEffect(() => {
+    const loadEntities = async () => {
+      if (!entityType) return;
+      
+      setLoading(true);
+      try {
+        const entities = await metricsService.fetchAvailableEntities(entityType);
+        setAvailableEntities(entities);
+      } catch (error) {
+        console.error(`Error cargando entidades para ${entityType}:`, error);
+        setAvailableEntities([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadEntities();
+  }, [entityType]);
 
   return (
     <Box sx={{ mb: 2 }}>
@@ -25,7 +41,14 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
         >
           <MenuItem value="tipo">Tipo</MenuItem>
           <MenuItem value="marca">Marca</MenuItem>
-          <MenuItem value="atributo">Atributo</MenuItem>
+          <MenuItem value="origen">Origen</MenuItem>
+          <MenuItem value="paisProd">País</MenuItem>
+          <MenuItem value="secado">Secado</MenuItem>
+          <MenuItem value="establecimiento">Establecimiento</MenuItem>
+          <MenuItem value="containsPalo">Con/Sin Palo</MenuItem>
+          <MenuItem value="leafCut">Corte de Hoja</MenuItem>
+          <MenuItem value="tipoEstacionamiento">Tipo Estacionamiento</MenuItem>
+          <MenuItem value="produccion">Producción</MenuItem>
         </Select>
       </FormControl>
 
@@ -37,9 +60,27 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
             onEntitiesChange(value);
           }
         }}
-        options={options}
-        renderInput={(params) => <TextField {...params} label="Entidades" placeholder="Selecciona" size="small" />}
+        options={availableEntities}
+        loading={loading}
+        renderInput={(params) => (
+          <TextField 
+            {...params} 
+            label="Entidades" 
+            placeholder="Selecciona" 
+            size="small"
+            InputProps={{
+              ...params.InputProps,
+              endAdornment: (
+                <>
+                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                  {params.InputProps.endAdornment}
+                </>
+              ),
+            }}
+          />
+        )}
         sx={{ width: 300, display: 'inline-block' }}
+        noOptionsText={loading ? "Cargando..." : "No hay opciones disponibles"}
       />
     </Box>
   );

@@ -61,13 +61,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <BrowserRouter>
-        <Box sx={{ 
-          minHeight: '100vh', 
-          bgcolor: 'background.default',
-          py: 2 
-        }}>
-          <DashboardRoutes />
-        </Box>
+        <DashboardRoutes />
       </BrowserRouter>
     </ThemeProvider>
   );
