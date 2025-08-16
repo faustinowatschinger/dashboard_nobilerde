@@ -9,7 +9,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
-  Cell
+  Cell,
+  LabelList
 } from 'recharts';
 import { Box, Typography, useTheme, alpha, Chip, Alert } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
@@ -155,6 +156,47 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     return null;
   };
 
+  // --- Custom label renderer for bars: always show percent, above positive bars and below negative bars ---
+  const CustomBarLabel = ({ x, y, width, height, value, index, payload }) => {
+    // value is the tendencyPercent numeric
+    if (value === undefined || value === null || isNaN(value)) return null;
+
+    // Determine font size based on number of bars to avoid overlap
+    const baseFont = 12;
+    const sizeReduction = Math.floor(chartData.length / 10); // reduce size when many bars
+    const fontSize = Math.max(9, baseFont - sizeReduction);
+
+    const centerX = x + width / 2;
+
+    // If positive, place above the bar; if negative, place below the bar
+    const isPositive = value >= 0;
+    const offset = isPositive ? -6 : -6; // px offset from bar
+    const posY = isPositive ? y + offset : y + height + offset;
+
+    // Format value as percent with one decimal (hide .0 for integers)
+    const formatted = Number(value).toFixed(1).replace(/\.0$/, '') + '%';
+
+    // Choose color: if label would overlay the bar (small bar), use text.primary; otherwise try white for contrast
+    // Heuristic: if bar height is > 18px, consider overlaying inside (white), else outside (text.primary)
+    const overlayCondition = Math.abs(height) > 18;
+    const fillColor = overlayCondition && isPositive ? '#00000' : 'currentColor';
+
+    return (
+      <text
+        x={centerX}
+        y={posY}
+        textAnchor="middle"
+        fill={fillColor}
+        fontSize={fontSize}
+        fontWeight={600}
+        style={{ pointerEvents: 'none' }}
+      >
+        {formatted}
+      </text>
+    );
+  };
+  // --- end CustomBarLabel ---
+
   // Si no hay datos válidos, mostrar mensaje
   if (!chartData || chartData.length === 0 || chartData.every(d => !d.entity || typeof d.tendencyPercent !== 'number')) {
     console.log('🚫 TrendsComparisonChart - No hay datos válidos para renderizar:', {
@@ -223,12 +265,20 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="entity" />
+            <XAxis 
+              dataKey="entity" 
+              tick={{ fontSize: 12 }}
+              interval={0}
+              angle={chartData.length > 8 ? -45 : 0}
+              textAnchor={chartData.length > 8 ? 'end' : 'middle'}
+              height={chartData.length > 8 ? 60 : 30}
+            />
             <YAxis domain={[-1, 1]} tickFormatter={(value) => `${value.toFixed(0)}%`} />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke={theme.palette.divider} strokeWidth={2} />
             
             <Bar dataKey="tendencyPercent">
+              <LabelList dataKey="tendencyPercent" content={CustomBarLabel} />
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={theme.palette.grey[400]} />
               ))}
@@ -317,11 +367,19 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
           margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="entity" />
+          <XAxis 
+            dataKey="entity" 
+            interval={0}
+            angle={chartData.length > 8 ? -45 : 0}
+            textAnchor={chartData.length > 8 ? 'end' : 'middle'}
+            height={chartData.length > 8 ? 60 : 30}
+            tick={{ fontSize: 12 }}
+          />
           <YAxis domain={yAxisDomain} tickFormatter={(value) => `${value.toFixed(0)}%`} />
           <Tooltip content={<CustomTooltip />} />
           
           <Bar dataKey="tendencyPercent">
+            <LabelList dataKey="tendencyPercent" content={CustomBarLabel} />
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.fill} />
             ))}
