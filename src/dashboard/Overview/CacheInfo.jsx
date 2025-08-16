@@ -22,7 +22,7 @@ import {
   AccessTime,
   Clear 
 } from '@mui/icons-material';
-import { fetchCacheStats, clearCache } from '../../services/metricsService.js';
+import metricsService from '../../services/metricsService.js';
 
 const CacheInfo = ({ data }) => {
   const [open, setOpen] = useState(false);
@@ -88,7 +88,7 @@ const CacheInfo = ({ data }) => {
   const loadCacheStats = async () => {
     setLoading(true);
     try {
-      const stats = await fetchCacheStats();
+      const stats = await metricsService.fetchCacheStats();
       setCacheStats(stats);
     } catch (error) {
       console.error('Error loading cache stats:', error);
@@ -100,7 +100,7 @@ const CacheInfo = ({ data }) => {
   // Limpiar cache
   const handleClearCache = async () => {
     try {
-      await clearCache();
+      await metricsService.clearCache();
       await loadCacheStats(); // Recargar estadísticas
     } catch (error) {
       console.error('Error clearing cache:', error);

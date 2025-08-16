@@ -33,7 +33,7 @@ import LoadingSkeleton from './LoadingSkeleton.jsx';
 import CacheInfo from './CacheInfo.jsx';
 
 import useFiltersStore from '../store/filtersStore.js';
-import { fetchOverviewWithComparison, fetchNotesTopWithComparison, refreshOverview } from '../../services/metricsService.js';
+import metricsService from '../../services/metricsService.js';
 
 const OverviewPage = () => {
   const theme = useTheme();
@@ -165,8 +165,8 @@ const OverviewPage = () => {
 
         // Cargar ambos tipos de datos en paralelo
         const [overviewData, notesTopResponseData] = await Promise.all([
-          fetchOverviewWithComparison(filters),
-          fetchNotesTopWithComparison(filters).catch(err => {
+          metricsService.fetchOverviewWithComparison(filters),
+          metricsService.fetchNotesTopWithComparison(filters).catch(err => {
             console.warn('Error cargando notas top:', err);
             setNotesTopError(err.message || 'Error cargando notas sensoriales');
             return null;
@@ -217,7 +217,7 @@ const OverviewPage = () => {
         timePeriod,
         useCustomDates
       };
-      const refreshedData = await refreshOverview(filters);
+      const refreshedData = await metricsService.refreshOverview(filters);
       setData(refreshedData);
     } catch (err) {
       setError(err.message || 'Error refrescando datos');
@@ -268,16 +268,8 @@ const OverviewPage = () => {
         {/* Header del Dashboard */}
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Box>
-              <Typography variant="h4" component="h1" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                Dashboard Overview
-              </Typography>
-              <Typography variant="body1" color="text.secondary">
-                Análisis completo de métricas y actividad de la plataforma
-              </Typography>
-            </Box>
             
-            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', gap: 2, marginTop: 10, alignItems: 'center' }}>
               <Chip 
                 icon={<Analytics />} 
                 label={`Período: ${timePeriod || 'mes'}`} 
@@ -355,10 +347,12 @@ const OverviewPage = () => {
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <MetricCard
-                  title="Muestra Activa"
-                  value={data.sample?.nUsers || 0}
+                  title="Usuarios Activos"
+                  value={data.sample?.activeUsers || data.activeUsers || 0}
                   icon={<Analytics />}
-                  hint="Usuarios en la muestra analizada"
+                  hint={`Usuarios con actividad en el ${timePeriod || 'período'}`}
+                  deltaText={comparisonData?.deltas?.activeUsers ? formatDelta(comparisonData.deltas.activeUsers)?.text : undefined}
+                  trend={comparisonData?.deltas?.activeUsers ? formatDelta(comparisonData.deltas.activeUsers)?.trend : 'flat'}
                   loading={false}
                   color="warning"
                 />

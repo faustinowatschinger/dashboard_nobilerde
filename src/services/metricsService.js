@@ -1,5 +1,5 @@
 // src/services/metricsService.js
-import apiClient from './apiClient.js';
+import apiClient, { apiGet } from './apiClient.js';
 import dayjs from 'dayjs';
 
 /**
@@ -275,10 +275,14 @@ export const metricsService = {
     const currentEvents = getTotalEvents(currentData);
     const previousEvents = getTotalEvents(previousData);
     
+    const currentActiveUsers = currentData.sample?.activeUsers || currentData.activeUsers || 0;
+    const previousActiveUsers = previousData.sample?.activeUsers || previousData.activeUsers || 0;
+    
     return {
       usersWithTasting30d: calculateDelta(currentUsers, previousUsers),
       discoveryRatePp: currentDiscoveryRate - previousDiscoveryRate, // Diferencia en puntos porcentuales
-      eventsTotal: calculateDelta(currentEvents, previousEvents)
+      eventsTotal: calculateDelta(currentEvents, previousEvents),
+      activeUsers: calculateDelta(currentActiveUsers, previousActiveUsers)
     };
   },
 
@@ -441,6 +445,25 @@ export const metricsService = {
   },
 
   /**
+   * Obtiene tendencias
+   * @param {Object} params
+   * @returns {Promise<Object>} Datos de tendencias
+   */
+  async fetchTrends(params = {}) {
+    try {
+      const data = await apiGet('/api/metrics/trends', params);
+      return {
+        kAnonymityOk: data.kAnonymityOk,
+        sample: data.sample || {},
+        series: Array.isArray(data.series) ? data.series : [],
+        bucket: data.bucket || 'day',
+      };
+    } catch (error) {
+      console.error('Error fetching trends:', error);
+      throw new Error(`Error cargando tendencias: ${error.message}`);
+    }
+  },
+  /**
    * Obtiene estadísticas del cache de métricas
    * @returns {Promise<Object>} Estadísticas del cache
    */
@@ -466,18 +489,134 @@ export const metricsService = {
       console.error('Error clearing cache:', error);
       throw new Error(`Error limpiando cache: ${error.message}`);
     }
-  }
-};
+  },
 
-// Exportar funciones individuales para facilitar las importaciones
-export const fetchOverview = metricsService.fetchOverview;
-export const fetchOverviewWithComparison = metricsService.fetchOverviewWithComparison;
-export const fetchNotesTopWithComparison = metricsService.fetchNotesTopWithComparison;
-export const refreshOverview = metricsService.refreshOverview;
-export const fetchFilterOptions = metricsService.fetchFilterOptions;
-export const fetchMarketTrends = metricsService.fetchMarketTrends;
-export const fetchFlavorAnalysis = metricsService.fetchFlavorAnalysis;
-export const fetchCacheStats = metricsService.fetchCacheStats;
-export const clearCache = metricsService.clearCache;
+  /**
+   * Obtiene entidades disponibles por tipo desde el backend
+   * @param {string} entityType - Tipo de entidad (tipo, marca, origen, etc.)
+   * @returns {Promise<Array>} Lista de entidades disponibles
+   */
+  async fetchAvailableEntities(entityType) {
+    try {
+      console.log(`🔍 Obteniendo entidades disponibles para tipo: ${entityType}`);
+      
+      const queryParams = new URLSearchParams();
+      queryParams.append('type', entityType);
+      
+      const url = `/api/metrics/entities?${queryParams.toString()}`;
+      console.log('🌐 URL de entidades:', url);
+      
+      const response = await apiClient.get(url);
+      
+      if (!response || !Array.isArray(response.entities)) {
+        throw new Error('Formato de respuesta inválido del servidor');
+      }
+      
+      console.log(`✅ Entidades obtenidas para ${entityType}:`, response.entities);
+      
+      return response.entities;
+    } catch (error) {
+      console.error(`❌ Error fetching available entities for ${entityType}:`, error);
+      throw new Error(`Error obteniendo entidades disponibles: ${error.message}`);
+    }
+  },
+
+  /**
+   * Obtiene datos de tendencias comparativas calculando cambios porcentuales
+   * @param {Object} filters - Filtros aplicados
+   * @returns {Promise<Object>} Tendencias con porcentajes de cambio
+   */
+  async fetchTrendsComparison(filters = {}) {
+    try {
+      console.log('📈 Obteniendo tendencias comparativas con filtros:', filters);
+      
+      // Convertir filtros del store al formato del backend
+      const queryParams = new URLSearchParams();
+      
+      // Filtros temporales - formatear fechas correctamente
+      if (filters.dateRange?.start && filters.dateRange?.end) {
+        const startDate = dayjs(filters.dateRange.start).format('YYYY-MM-DD');
+        const endDate = dayjs(filters.dateRange.end).format('YYYY-MM-DD');
+        queryParams.append('startDate', startDate);
+        queryParams.append('endDate', endDate);
+      }
+      
+      if (filters.timePeriod) {
+        queryParams.append('timePeriod', filters.timePeriod);
+      }
+      
+      // Filtros demográficos
+      if (filters.country && filters.country !== 'ALL') {
+        queryParams.append('country', filters.country);
+      }
+      if (filters.ageBucket && filters.ageBucket !== 'ALL') {
+        queryParams.append('ageBucket', filters.ageBucket);
+      }
+      if (filters.gender && filters.gender !== 'ALL') {
+        queryParams.append('gender', filters.gender);
+      }
+      
+      // Filtros de yerba
+      if (filters.tipoYerba && filters.tipoYerba !== 'ALL') {
+        queryParams.append('tipoYerba', filters.tipoYerba);
+      }
+      if (filters.marca && filters.marca !== 'ALL') {
+        queryParams.append('marca', filters.marca);
+      }
+      if (filters.origen && filters.origen !== 'ALL') {
+        queryParams.append('origen', filters.origen);
+      }
+      
+      // Filtros de tendencias específicos
+      if (filters.metric) {
+        queryParams.append('metric', filters.metric);
+      }
+      if (filters.entityType) {
+        queryParams.append('entityType', filters.entityType);
+      }
+      if (filters.entities && filters.entities.length > 0) {
+        queryParams.append('entities', filters.entities.join(','));
+      }
+      
+      const url = `/api/metrics/trends-comparison?${queryParams.toString()}`;
+      console.log('🌐 URL de tendencias comparativas:', url);
+      
+      const response = await apiClient.get(url);
+      
+      if (!response || !response.trends) {
+        throw new Error('Formato de respuesta inválido del servidor');
+      }
+      
+      console.log('✅ Tendencias comparativas obtenidas:', {
+        entitiesCount: response.trends.length,
+        kAnonymityOk: response.kAnonymityOk,
+        avgTendency: response.trends.reduce((sum, t) => sum + Math.abs(t.tendencyPercent), 0) / response.trends.length,
+        firstTrend: response.trends[0],
+        allTrendsData: response.trends.slice(0, 3) // Mostrar las primeras 3 para debug
+      });
+      
+      return response;
+    } catch (error) {
+      console.error('❌ Error fetching trends comparison:', error);
+      throw new Error(`Error obteniendo tendencias comparativas: ${error.message}`);
+    }
+  },
+
+
+
+  /**
+   * Mapea período de tiempo a bucket para el backend
+   */
+  mapTimePeriodToBucket(timePeriod) {
+    switch (timePeriod) {
+      case 'dia': return 'hour';
+      case 'semana': return 'day';
+      case 'mes': return 'week';
+      case 'año': return 'month';
+      default: return 'day';
+    }
+  },
+
+};
 
 export default metricsService;
