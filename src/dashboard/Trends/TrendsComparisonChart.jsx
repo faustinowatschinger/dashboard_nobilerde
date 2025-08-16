@@ -14,19 +14,49 @@ import {
 } from 'recharts';
 import { Box, Typography, useTheme, alpha, Chip, Alert } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
+import useFiltersStore from '../store/filtersStore.js';
 
 const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   const theme = useTheme();
 
+  // Obtener filtros activos del store global. Estos representan las
+  // características del usuario por las que se puede filtrar.
+  const {
+    country,
+    ageBucket,
+    gender,
+    tipoYerba,
+    marca,
+    origen,
+    paisProd,
+    secado
+  } = useFiltersStore();
+
   // Debug: Log de datos recibidos
   console.log('📊 TrendsComparisonChart - Props recibidas:', { trends, loading });
+  console.log('🎯 Filtros activos:', { country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado });
+
+  // Filtrar trends según los filtros seleccionados por el usuario.
+  const filteredTrends = useMemo(() => {
+    return (Array.isArray(trends) ? trends : []).filter((trend) => {
+      if (country && trend.country && trend.country !== country) return false;
+      if (ageBucket && trend.ageBucket && trend.ageBucket !== ageBucket) return false;
+      if (gender && trend.gender && trend.gender !== gender) return false;
+      if (tipoYerba && trend.tipoYerba && trend.tipoYerba !== tipoYerba) return false;
+      if (marca && trend.marca && trend.marca !== marca) return false;
+      if (origen && trend.origen && trend.origen !== origen) return false;
+      if (paisProd && trend.paisProd && trend.paisProd !== paisProd) return false;
+      if (secado && trend.secado && trend.secado !== secado) return false;
+      return true;
+    });
+  }, [trends, country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado]);
 
   // Transformar datos al formato del gráfico
   const chartData = useMemo(() => {
-    console.log('📊 TrendsComparisonChart - Procesando trends:', trends);
-    
-    if (!Array.isArray(trends) || trends.length === 0) {
-      console.log('❌ TrendsComparisonChart - No hay trends válidos:', { trends, isArray: Array.isArray(trends), length: trends?.length });
+    console.log('📊 TrendsComparisonChart - Procesando trends:', filteredTrends);
+
+    if (!Array.isArray(filteredTrends) || filteredTrends.length === 0) {
+      console.log('❌ TrendsComparisonChart - No hay trends válidos:', { trends: filteredTrends, isArray: Array.isArray(filteredTrends), length: filteredTrends?.length });
       
       // DEBUGGING: Crear datos de prueba si no hay datos reales
       console.log('🧪 Creando datos de prueba para debugging...');
@@ -58,7 +88,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
       ];
     }
 
-    const mapped = trends.map((trend, index) => {
+    const mapped = filteredTrends.map((trend, index) => {
       console.log(`📋 Procesando trend ${index + 1}:`, {
         entity: trend.entity,
         tendencyPercent: trend.tendencyPercent,
@@ -96,7 +126,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     });
     
     return mapped;
-  }, [trends, theme]);
+  }, [filteredTrends, theme]);
 
   // Tooltip personalizado
   const CustomTooltip = ({ active, payload, label }) => {
@@ -157,7 +187,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   };
 
   // --- Custom label renderer for bars: always show percent, above positive bars and below negative bars ---
-  const CustomBarLabel = ({ x, y, width, height, value, index, payload }) => {
+  const CustomBarLabel = ({ x, y, width, height, value }) => {
     // value is the tendencyPercent numeric
     if (value === undefined || value === null || isNaN(value)) return null;
 
