@@ -1,5 +1,5 @@
 // src/dashboard/Trends/TrendsComparisonChart.jsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import {
   BarChart,
   Bar,
@@ -12,7 +12,18 @@ import {
   Cell,
   LabelList
 } from 'recharts';
-import { Box, Typography, useTheme, alpha, Chip, Alert } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useTheme,
+  alpha,
+  Chip,
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem
+} from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
 import useFiltersStore from '../store/filtersStore.js';
 
@@ -29,8 +40,62 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     marca,
     origen,
     paisProd,
-    secado
+    secado,
+    setFilter,
+    filterOptions,
+    loadFilterOptions
   } = useFiltersStore();
+
+  // Cargar opciones de filtros al montar
+  useEffect(() => {
+    loadFilterOptions();
+  }, [loadFilterOptions]);
+
+  // Preparar configuraciones para los selectores
+  const filtersValues = { country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado };
+  const {
+    paisesUsuario = [],
+    edades = [],
+    generos = [],
+    tipos = [],
+    marcas = [],
+    origenes = [],
+    paisesProd: paisesProdOptions = [],
+    secados: secadosOptions = []
+  } = filterOptions;
+
+  const filterControls = [
+    { key: 'country', label: 'País', options: paisesUsuario },
+    { key: 'ageBucket', label: 'Edad', options: edades },
+    { key: 'gender', label: 'Género', options: generos },
+    { key: 'tipoYerba', label: 'Tipo Yerba', options: tipos },
+    { key: 'marca', label: 'Marca', options: marcas },
+    { key: 'origen', label: 'Origen', options: origenes },
+    { key: 'paisProd', label: 'País Prod.', options: paisesProdOptions },
+    { key: 'secado', label: 'Secado', options: secadosOptions }
+  ];
+
+  const renderFilterControls = () => (
+    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+      {filterControls.map((ctrl) => (
+        <FormControl key={ctrl.key} size="small" sx={{ minWidth: 140 }}>
+          <InputLabel>{ctrl.label}</InputLabel>
+          <Select
+            value={filtersValues[ctrl.key] || ''}
+            label={ctrl.label}
+            onChange={(e) => setFilter(ctrl.key, e.target.value)}
+          >
+            <MenuItem value="">Todos</MenuItem>
+            {ctrl.options.map((opt) => (
+              <MenuItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ))}
+    </Box>
+  );
 
   // Debug: Log de datos recibidos
   console.log('📊 TrendsComparisonChart - Props recibidas:', { trends, loading });
@@ -236,27 +301,30 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     });
     
     return (
-      <Box
-        sx={{
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: alpha(theme.palette.background.paper, 0.5),
-          borderRadius: 2,
-          border: `2px dashed ${theme.palette.divider}`,
-          flexDirection: 'column',
-          gap: 2
-        }}
-      >
-        <DonutLarge sx={{ fontSize: 48, color: 'text.disabled' }} />
-        <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
-          No hay datos de tendencias disponibles
-          <br />
-          <Typography variant="caption" component="span">
-            {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
+      <Box sx={{ height: '100%', width: '100%' }}>
+        {renderFilterControls()}
+        <Box
+          sx={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: alpha(theme.palette.background.paper, 0.5),
+            borderRadius: 2,
+            border: `2px dashed ${theme.palette.divider}`,
+            flexDirection: 'column',
+            gap: 2
+          }}
+        >
+          <DonutLarge sx={{ fontSize: 48, color: 'text.disabled' }} />
+          <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+            No hay datos de tendencias disponibles
+            <br />
+            <Typography variant="caption" component="span">
+              {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
+            </Typography>
           </Typography>
-        </Typography>
+        </Box>
       </Box>
     );
   }
@@ -270,8 +338,9 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     
     return (
       <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-        <Alert 
-          severity="info" 
+        {renderFilterControls()}
+        <Alert
+          severity="info"
           sx={{ mb: 2 }}
           icon={<TrendingFlat />}
         >
@@ -279,7 +348,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             Datos estables - Sin variación significativa
           </Typography>
           <Typography variant="body2">
-            {hasVolumeData 
+            {hasVolumeData
               ? 'Las entidades seleccionadas muestran valores estables entre períodos. Esto puede ocurrir cuando hay poca variación en los eventos de la métrica seleccionada.'
               : 'No se encontraron variaciones significativas en el período seleccionado.'
             }
@@ -295,8 +364,8 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="entity" 
+            <XAxis
+              dataKey="entity"
               tick={{ fontSize: 12 }}
               interval={0}
               angle={chartData.length > 8 ? -45 : 0}
@@ -306,7 +375,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             <YAxis domain={[-1, 1]} tickFormatter={(value) => `${value.toFixed(0)}%`} />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke={theme.palette.divider} strokeWidth={2} />
-            
+
             <Bar dataKey="tendencyPercent">
               <LabelList dataKey="tendencyPercent" content={CustomBarLabel} />
               {chartData.map((entry, index) => (
@@ -367,12 +436,13 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
 
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
+      {renderFilterControls()}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-        <Chip 
-          icon={<TrendingUp />} 
-          label="Crecimiento" 
-          size="small" 
-          color="success" 
+        <Chip
+          icon={<TrendingUp />}
+          label="Crecimiento"
+          size="small"
+          color="success"
           variant="outlined"
         />
         <Chip 
