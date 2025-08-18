@@ -15,22 +15,38 @@ const useFiltersStore = create((set, get) => ({
   country: '',
   ageBucket: '',
   gender: '',
+  tipoMatero: '',
+  tipoMate: '',
+  termosDia: '',
   tipoYerba: '',
   marca: '',
+  establecimiento: '',
   origen: '',
   paisProd: '',
   secado: '',
+  leafCut: '',
+  tipoEstacionamiento: '',
+  produccion: '',
+  containsPalo: '',
 
   // Opciones para los selectores (se llenan dinámicamente)
   options: {
     countries: [],
     ageBuckets: ['18-25', '26-35', '36-45', '46-55', '56+'],
     genders: ['M', 'F', 'Otro'],
+    tiposMatero: [],
+    tiposMate: [],
+    termosDia: [],
     tiposYerba: [],
     marcas: [],
+    establecimientos: [],
     origenes: [],
     paisesProd: [],
-    tiposSecado: []
+    tiposSecado: [],
+    leafCuts: [],
+    tiposEstacionamiento: [],
+    producciones: [],
+    containsPalo: []
   },
 
   // Loading state para las opciones
@@ -165,11 +181,19 @@ const useFiltersStore = create((set, get) => ({
     country: '',
     ageBucket: '',
     gender: '',
+    tipoMatero: '',
+    tipoMate: '',
+    termosDia: '',
     tipoYerba: '',
     marca: '',
+    establecimiento: '',
     origen: '',
     paisProd: '',
-    secado: ''
+    secado: '',
+    leafCut: '',
+    tipoEstacionamiento: '',
+    produccion: '',
+    containsPalo: ''
   }),
 
   // Actualizar opciones disponibles
@@ -198,11 +222,19 @@ const useFiltersStore = create((set, get) => ({
     if (state.country) filters.country = state.country;
     if (state.ageBucket) filters.ageBucket = state.ageBucket;
     if (state.gender) filters.gender = state.gender;
+    if (state.tipoMatero) filters.tipoMatero = state.tipoMatero;
+    if (state.tipoMate) filters.tipoMate = state.tipoMate;
+    if (state.termosDia) filters.termosDia = state.termosDia;
     if (state.tipoYerba) filters.tipoYerba = state.tipoYerba;
     if (state.marca) filters.marca = state.marca;
+    if (state.establecimiento) filters.establecimiento = state.establecimiento;
     if (state.origen) filters.origen = state.origen;
     if (state.paisProd) filters.paisProd = state.paisProd;
     if (state.secado) filters.secado = state.secado;
+    if (state.leafCut) filters.leafCut = state.leafCut;
+    if (state.tipoEstacionamiento) filters.tipoEstacionamiento = state.tipoEstacionamiento;
+    if (state.produccion) filters.produccion = state.produccion;
+    if (state.containsPalo) filters.containsPalo = state.containsPalo;
     
     return filters;
   },
@@ -220,11 +252,79 @@ const useFiltersStore = create((set, get) => ({
     set({ loading: true, error: null });
     
     try {
-      // Por ahora usar datos mock hasta que la API esté lista
+      console.log('🔄 Cargando opciones de filtros desde nuevos endpoints...');
+      
+      // Cargar opciones reales desde los nuevos endpoints
+      const [userFiltersRes, yerbaFiltersRes] = await Promise.all([
+        fetch('/api/dashboard/filters/usuarios').then(r => r.json()).catch(err => {
+          console.error('Error fetching user filters:', err);
+          return [];
+        }),
+        fetch('/api/dashboard/filters/yerbas').then(r => r.json()).catch(err => {
+          console.error('Error fetching yerba filters:', err);
+          return [];
+        })
+      ]);
+
+      console.log('📊 User filters response:', userFiltersRes);
+      console.log('📊 Yerba filters response:', yerbaFiltersRes);
+
+      // Los nuevos endpoints devuelven arrays directamente
+      const userFilters = Array.isArray(userFiltersRes) ? userFiltersRes : [];
+      const yerbaFilters = Array.isArray(yerbaFiltersRes) ? yerbaFiltersRes : [];
+      
+      console.log('🔍 Parsed user filters:', userFilters);
+      console.log('🔍 Parsed yerba filters:', yerbaFilters);
+
+      // Extraer opciones únicas de los datos
+      const realOptions = {
+        countries: [...new Set(userFilters.map(u => u.nacionalidad).filter(Boolean))],
+        ageBuckets: [...new Set(userFilters.map(u => u.ageBucket).filter(Boolean))],
+        genders: [...new Set(userFilters.map(u => u.genero).filter(Boolean))],
+        tiposMatero: [...new Set(userFilters.map(u => u.tipoMatero).filter(Boolean))],
+        tiposMate: [...new Set(userFilters.map(u => u.tipoMate).filter(Boolean))],
+        termosDia: [...new Set(userFilters.map(u => u.termosDia).filter(Boolean))],
+        tiposYerba: [...new Set(yerbaFilters.map(y => y.tipo).filter(Boolean))],
+        marcas: [...new Set(yerbaFilters.map(y => y.marca).filter(Boolean))],
+        establecimientos: [...new Set(yerbaFilters.map(y => y.establecimiento).filter(Boolean))],
+        origenes: [...new Set(yerbaFilters.map(y => y.origen).filter(Boolean))],
+        paisesProd: [...new Set(yerbaFilters.map(y => y.paisProd).filter(Boolean))],
+        tiposSecado: [...new Set(yerbaFilters.map(y => y.secado).filter(Boolean))],
+        leafCuts: [...new Set(yerbaFilters.map(y => y.leafCut).filter(Boolean))],
+        tiposEstacionamiento: [...new Set(yerbaFilters.map(y => y.tipoEstacionamiento).filter(Boolean))],
+        producciones: [...new Set(yerbaFilters.map(y => y.produccion).filter(Boolean))],
+        containsPalo: [...new Set(yerbaFilters.map(y => y.containsPalo).filter(Boolean))]
+      };
+
+      console.log('🔄 Opciones transformadas para el store:', realOptions);
+      console.log('🎯 Opciones extraídas:');
+      console.log('  - Países:', realOptions.countries);
+      console.log('  - Edades:', realOptions.ageBuckets);
+      console.log('  - Géneros:', realOptions.genders);
+      console.log('  - Tipos Matero:', realOptions.tiposMatero);
+      console.log('  - Tipos Mate:', realOptions.tiposMate);
+      console.log('  - Termos/Día:', realOptions.termosDia);
+
+      set((state) => ({
+        options: {
+          ...state.options,
+          ...realOptions
+        },
+        loading: false
+      }));
+    } catch (error) {
+      console.error('Error loading filter options from backend:', error);
+      
+      // Fallback a datos mock si falla la API
       const mockOptions = {
         countries: ['Argentina', 'Uruguay', 'Brasil', 'Paraguay'],
-        tiposYerba: ['Tradicional', 'Con palo', 'Sin palo', 'Suave', 'Orgánica'],
-        marcas: ['La Merced', 'Taragui', 'Amanda', 'Union', 'Rosamonte'],
+        ageBuckets: ['18-25', '26-35', '36-45', '46-55', '56+'],
+        genders: ['M', 'F', 'Otro'],
+        tiposMatero: ['Calabaza', 'Madera', 'Silicón', 'Cerámica', 'Vidrio', 'Acero'],
+        tiposMate: ['Amargo', 'Dulce', 'Con hierbas'],
+        termosDia: ['1', '2', '3', '4', '5+'],
+        tiposYerba: ['Tradicional', 'Suave', 'Despalada', 'Premium/Selección', 'Barbacuá', 'Compuesta'],
+        marcas: ['La Merced', 'Taragui', 'Amanda', 'Union', 'Rosamonte', 'Kalena', 'Baldo', 'Sara'],
         origenes: ['Misiones', 'Corrientes', 'Entre Ríos'],
         paisesProd: ['Argentina', 'Brasil', 'Paraguay'],
         tiposSecado: ['Natural', 'Barbacuá', 'Mixto']
@@ -235,14 +335,9 @@ const useFiltersStore = create((set, get) => ({
           ...state.options,
           ...mockOptions
         },
-        loading: false
-      }));
-    } catch (error) {
-      console.error('Error loading filter options:', error);
-      set({ 
         loading: false, 
-        error: error.message || 'Error cargando opciones de filtros' 
-      });
+        error: error.message || 'Error cargando opciones de filtros (usando datos por defecto)'
+      }));
     }
   },
 
@@ -261,14 +356,25 @@ const useFiltersStore = create((set, get) => ({
     };
 
     return {
+      // Filtros de usuario
       paisesUsuario: transformOptions(state.options.countries),
       edades: transformOptions(state.options.ageBuckets),
       generos: transformOptions(state.options.genders),
+      tiposMatero: transformOptions(state.options.tiposMatero),
+      tiposMate: transformOptions(state.options.tiposMate),
+      termosDia: transformOptions(state.options.termosDia),
+      
+      // Filtros de yerba  
       tipos: transformOptions(state.options.tiposYerba),
       marcas: transformOptions(state.options.marcas),
+      establecimientos: transformOptions(state.options.establecimientos),
       origenes: transformOptions(state.options.origenes),
       paisesProd: transformOptions(state.options.paisesProd),
-      secados: transformOptions(state.options.tiposSecado)
+      secados: transformOptions(state.options.tiposSecado),
+      leafCuts: transformOptions(state.options.leafCuts),
+      tiposEstacionamiento: transformOptions(state.options.tiposEstacionamiento),
+      producciones: transformOptions(state.options.producciones),
+      containsPalo: transformOptions(state.options.containsPalo)
     };
   }
 }));

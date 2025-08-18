@@ -18,6 +18,7 @@ import FiltersBar from '../Overview/FiltersBar.jsx';
 import MetricSelector from './MetricSelector.jsx';
 import EntitiesSelector from './EntitiesSelector.jsx';
 import TrendsComparisonChart from './TrendsComparisonChart.jsx';
+import TrendsFiltersPanel from './TrendsFiltersPanel.jsx';
 import EmptyState from './EmptyState.jsx';
 import LoadingSkeleton from './LoadingSkeleton.jsx';
 import useFiltersStore from '../store/filtersStore.js';
@@ -41,7 +42,19 @@ const TrendsPage = () => {
     country,
     ageBucket,
     gender,
-    tipoYerba
+    tipoMatero,
+    tipoMate,
+    termosDia,
+    tipoYerba,
+    marca,
+    establecimiento,
+    origen,
+    paisProd,
+    secado,
+    leafCut,
+    tipoEstacionamiento,
+    produccion,
+    containsPalo
   } = useFiltersStore();
 
   // Efecto para cargar datos cuando cambien los filtros
@@ -59,7 +72,19 @@ const TrendsPage = () => {
           country,
           ageBucket,
           gender,
+          tipoMatero,
+          tipoMate,
+          termosDia,
           tipoYerba,
+          marca,
+          establecimiento,
+          origen,
+          paisProd,
+          secado,
+          leafCut,
+          tipoEstacionamiento,
+          produccion,
+          containsPalo,
           metric,
           entityType,
           entities
@@ -79,7 +104,7 @@ const TrendsPage = () => {
     };
 
     doLoad();
-  }, [dateRange, timePeriod, country, ageBucket, gender, tipoYerba, metric, entityType, entities]);
+  }, [dateRange, timePeriod, country, ageBucket, gender, tipoMatero, tipoMate, termosDia, tipoYerba, marca, establecimiento, origen, paisProd, secado, leafCut, tipoEstacionamiento, produccion, containsPalo, metric, entityType, entities]);
 
   // Función para cargar datos manualmente
   const loadData = async () => {
@@ -97,7 +122,19 @@ const TrendsPage = () => {
         country,
         ageBucket,
         gender,
+        tipoMatero,
+        tipoMate,
+        termosDia,
         tipoYerba,
+        marca,
+        establecimiento,
+        origen,
+        paisProd,
+        secado,
+        leafCut,
+        tipoEstacionamiento,
+        produccion,
+        containsPalo,
         metric,
         entityType,
         entities
@@ -124,10 +161,13 @@ const TrendsPage = () => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* Barra de filtros */}
+      {/* Barra de filtros temporales */}
       <Paper sx={{ p: 3, mb: 4, borderRadius: 2, marginTop: 10, boxShadow: theme.shadows[1] }}>
         <FiltersBar />
       </Paper>
+
+      {/* Panel de filtros de análisis */}
+      <TrendsFiltersPanel />
 
       {/* Error */}
       {error && (

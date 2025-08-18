@@ -12,7 +12,14 @@ import {
   Cell,
   LabelList
 } from 'recharts';
-import { Box, Typography, useTheme, alpha, Chip, Alert } from '@mui/material';
+import {
+  Box,
+  Typography,
+  useTheme,
+  alpha,
+  Chip,
+  Alert
+} from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
 
 const TrendsComparisonChart = ({ trends = [], loading = false }) => {
@@ -21,42 +28,10 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   // Debug: Log de datos recibidos
   console.log('📊 TrendsComparisonChart - Props recibidas:', { trends, loading });
 
-  // Transformar datos al formato del gráfico
+  // Transformar datos al formato del gráfico directamente, SIN FILTRADO LOCAL
+  // Todo el filtrado debe hacerse en el backend
   const chartData = useMemo(() => {
     console.log('📊 TrendsComparisonChart - Procesando trends:', trends);
-    
-    if (!Array.isArray(trends) || trends.length === 0) {
-      console.log('❌ TrendsComparisonChart - No hay trends válidos:', { trends, isArray: Array.isArray(trends), length: trends?.length });
-      
-      // DEBUGGING: Crear datos de prueba si no hay datos reales
-      console.log('🧪 Creando datos de prueba para debugging...');
-      return [
-        {
-          entity: 'Tradicional',
-          tendencyPercent: 15.5,
-          currentValue: 100,
-          previousValue: 87,
-          status: 'subida',
-          fill: theme.palette.success.main
-        },
-        {
-          entity: 'Suave',
-          tendencyPercent: -8.2,
-          currentValue: 45,
-          previousValue: 49,
-          status: 'bajada',
-          fill: theme.palette.error.main
-        },
-        {
-          entity: 'Premium',
-          tendencyPercent: 0,
-          currentValue: 25,
-          previousValue: 25,
-          status: 'sin cambio',
-          fill: theme.palette.grey[500]
-        }
-      ];
-    }
 
     const mapped = trends.map((trend, index) => {
       console.log(`📋 Procesando trend ${index + 1}:`, {
@@ -157,7 +132,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   };
 
   // --- Custom label renderer for bars: always show percent, above positive bars and below negative bars ---
-  const CustomBarLabel = ({ x, y, width, height, value, index, payload }) => {
+  const CustomBarLabel = ({ x, y, width, height, value }) => {
     // value is the tendencyPercent numeric
     if (value === undefined || value === null || isNaN(value)) return null;
 
@@ -206,27 +181,29 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     });
     
     return (
-      <Box
-        sx={{
-          height: '100%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: alpha(theme.palette.background.paper, 0.5),
-          borderRadius: 2,
-          border: `2px dashed ${theme.palette.divider}`,
-          flexDirection: 'column',
-          gap: 2
-        }}
-      >
-        <DonutLarge sx={{ fontSize: 48, color: 'text.disabled' }} />
-        <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
-          No hay datos de tendencias disponibles
-          <br />
-          <Typography variant="caption" component="span">
-            {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
+      <Box sx={{ height: '100%', width: '100%' }}>
+        <Box
+          sx={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: alpha(theme.palette.background.paper, 0.5),
+            borderRadius: 2,
+            border: `2px dashed ${theme.palette.divider}`,
+            flexDirection: 'column',
+            gap: 2
+          }}
+        >
+          <DonutLarge sx={{ fontSize: 48, color: 'text.disabled' }} />
+          <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+            No hay datos de tendencias disponibles
+            <br />
+            <Typography variant="caption" component="span">
+              {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
+            </Typography>
           </Typography>
-        </Typography>
+        </Box>
       </Box>
     );
   }
@@ -240,8 +217,8 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     
     return (
       <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-        <Alert 
-          severity="info" 
+        <Alert
+          severity="info"
           sx={{ mb: 2 }}
           icon={<TrendingFlat />}
         >
@@ -249,7 +226,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             Datos estables - Sin variación significativa
           </Typography>
           <Typography variant="body2">
-            {hasVolumeData 
+            {hasVolumeData
               ? 'Las entidades seleccionadas muestran valores estables entre períodos. Esto puede ocurrir cuando hay poca variación en los eventos de la métrica seleccionada.'
               : 'No se encontraron variaciones significativas en el período seleccionado.'
             }
@@ -265,8 +242,8 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="entity" 
+            <XAxis
+              dataKey="entity"
               tick={{ fontSize: 12 }}
               interval={0}
               angle={chartData.length > 8 ? -45 : 0}
@@ -276,7 +253,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             <YAxis domain={[-1, 1]} tickFormatter={(value) => `${value.toFixed(0)}%`} />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke={theme.palette.divider} strokeWidth={2} />
-            
+
             <Bar dataKey="tendencyPercent">
               <LabelList dataKey="tendencyPercent" content={CustomBarLabel} />
               {chartData.map((entry, index) => (
@@ -338,11 +315,11 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-        <Chip 
-          icon={<TrendingUp />} 
-          label="Crecimiento" 
-          size="small" 
-          color="success" 
+        <Chip
+          icon={<TrendingUp />}
+          label="Crecimiento"
+          size="small"
+          color="success"
           variant="outlined"
         />
         <Chip 

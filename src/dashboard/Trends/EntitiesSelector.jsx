@@ -10,6 +10,7 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
   const entityTypeInfo = {
     tipo: { variationLevel: 'Alta', note: 'Buena variación temporal' },
     marca: { variationLevel: 'Alta', note: 'Diferencias significativas' },
+    yerbas: { variationLevel: 'Muy Alta', note: 'Comparación específica entre productos' },
     origen: { variationLevel: 'Media', note: 'Variación moderada' },
     paisProd: { variationLevel: 'Baja', note: 'Descubrimiento estable (100%)' },
     secado: { variationLevel: 'Media', note: 'Diferencias técnicas' },
@@ -55,6 +56,7 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
         >
           <MenuItem value="tipo">Tipo</MenuItem>
           <MenuItem value="marca">Marca</MenuItem>
+          <MenuItem value="yerbas">Yerbas Específicas</MenuItem>
           <MenuItem value="origen">Origen</MenuItem>
           <MenuItem value="paisProd">País</MenuItem>
           <MenuItem value="secado">Secado</MenuItem>
