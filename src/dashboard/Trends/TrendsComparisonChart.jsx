@@ -1,5 +1,5 @@
 // src/dashboard/Trends/TrendsComparisonChart.jsx
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -18,142 +18,22 @@ import {
   useTheme,
   alpha,
   Chip,
-  Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem
+  Alert
 } from '@mui/material';
 import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-material';
-import useFiltersStore from '../store/filtersStore.js';
 
 const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   const theme = useTheme();
 
-  // Obtener filtros activos del store global. Estos representan las
-  // características del usuario por las que se puede filtrar.
-  const {
-    country,
-    ageBucket,
-    gender,
-    tipoYerba,
-    marca,
-    origen,
-    paisProd,
-    secado,
-    setFilter,
-    filterOptions,
-    loadFilterOptions
-  } = useFiltersStore();
-
-  // Cargar opciones de filtros al montar
-  useEffect(() => {
-    loadFilterOptions();
-  }, [loadFilterOptions]);
-
-  // Preparar configuraciones para los selectores
-  const filtersValues = { country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado };
-  const {
-    paisesUsuario = [],
-    edades = [],
-    generos = [],
-    tipos = [],
-    marcas = [],
-    origenes = [],
-    paisesProd: paisesProdOptions = [],
-    secados: secadosOptions = []
-  } = filterOptions;
-
-  const filterControls = [
-    { key: 'country', label: 'País', options: paisesUsuario },
-    { key: 'ageBucket', label: 'Edad', options: edades },
-    { key: 'gender', label: 'Género', options: generos },
-    { key: 'tipoYerba', label: 'Tipo Yerba', options: tipos },
-    { key: 'marca', label: 'Marca', options: marcas },
-    { key: 'origen', label: 'Origen', options: origenes },
-    { key: 'paisProd', label: 'País Prod.', options: paisesProdOptions },
-    { key: 'secado', label: 'Secado', options: secadosOptions }
-  ];
-
-  const renderFilterControls = () => (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
-      {filterControls.map((ctrl) => (
-        <FormControl key={ctrl.key} size="small" sx={{ minWidth: 140 }}>
-          <InputLabel>{ctrl.label}</InputLabel>
-          <Select
-            value={filtersValues[ctrl.key] || ''}
-            label={ctrl.label}
-            onChange={(e) => setFilter(ctrl.key, e.target.value)}
-          >
-            <MenuItem value="">Todos</MenuItem>
-            {ctrl.options.map((opt) => (
-              <MenuItem key={opt.value} value={opt.value}>
-                {opt.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      ))}
-    </Box>
-  );
-
   // Debug: Log de datos recibidos
   console.log('📊 TrendsComparisonChart - Props recibidas:', { trends, loading });
-  console.log('🎯 Filtros activos:', { country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado });
 
-  // Filtrar trends según los filtros seleccionados por el usuario.
-  const filteredTrends = useMemo(() => {
-    return (Array.isArray(trends) ? trends : []).filter((trend) => {
-      if (country && trend.country && trend.country !== country) return false;
-      if (ageBucket && trend.ageBucket && trend.ageBucket !== ageBucket) return false;
-      if (gender && trend.gender && trend.gender !== gender) return false;
-      if (tipoYerba && trend.tipoYerba && trend.tipoYerba !== tipoYerba) return false;
-      if (marca && trend.marca && trend.marca !== marca) return false;
-      if (origen && trend.origen && trend.origen !== origen) return false;
-      if (paisProd && trend.paisProd && trend.paisProd !== paisProd) return false;
-      if (secado && trend.secado && trend.secado !== secado) return false;
-      return true;
-    });
-  }, [trends, country, ageBucket, gender, tipoYerba, marca, origen, paisProd, secado]);
-
-  // Transformar datos al formato del gráfico
+  // Transformar datos al formato del gráfico directamente, SIN FILTRADO LOCAL
+  // Todo el filtrado debe hacerse en el backend
   const chartData = useMemo(() => {
-    console.log('📊 TrendsComparisonChart - Procesando trends:', filteredTrends);
+    console.log('📊 TrendsComparisonChart - Procesando trends:', trends);
 
-    if (!Array.isArray(filteredTrends) || filteredTrends.length === 0) {
-      console.log('❌ TrendsComparisonChart - No hay trends válidos:', { trends: filteredTrends, isArray: Array.isArray(filteredTrends), length: filteredTrends?.length });
-      
-      // DEBUGGING: Crear datos de prueba si no hay datos reales
-      console.log('🧪 Creando datos de prueba para debugging...');
-      return [
-        {
-          entity: 'Tradicional',
-          tendencyPercent: 15.5,
-          currentValue: 100,
-          previousValue: 87,
-          status: 'subida',
-          fill: theme.palette.success.main
-        },
-        {
-          entity: 'Suave',
-          tendencyPercent: -8.2,
-          currentValue: 45,
-          previousValue: 49,
-          status: 'bajada',
-          fill: theme.palette.error.main
-        },
-        {
-          entity: 'Premium',
-          tendencyPercent: 0,
-          currentValue: 25,
-          previousValue: 25,
-          status: 'sin cambio',
-          fill: theme.palette.grey[500]
-        }
-      ];
-    }
-
-    const mapped = filteredTrends.map((trend, index) => {
+    const mapped = trends.map((trend, index) => {
       console.log(`📋 Procesando trend ${index + 1}:`, {
         entity: trend.entity,
         tendencyPercent: trend.tendencyPercent,
@@ -191,7 +71,7 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     });
     
     return mapped;
-  }, [filteredTrends, theme]);
+  }, [trends, theme]);
 
   // Tooltip personalizado
   const CustomTooltip = ({ active, payload, label }) => {
@@ -302,7 +182,6 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     
     return (
       <Box sx={{ height: '100%', width: '100%' }}>
-        {renderFilterControls()}
         <Box
           sx={{
             height: '100%',
@@ -338,7 +217,6 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     
     return (
       <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-        {renderFilterControls()}
         <Alert
           severity="info"
           sx={{ mb: 2 }}
@@ -436,7 +314,6 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
 
   return (
     <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-      {renderFilterControls()}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
         <Chip
           icon={<TrendingUp />}

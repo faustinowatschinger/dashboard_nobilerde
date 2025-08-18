@@ -566,6 +566,27 @@ export const metricsService = {
       if (filters.origen && filters.origen !== 'ALL') {
         queryParams.append('origen', filters.origen);
       }
+      if (filters.paisProd && filters.paisProd !== 'ALL') {
+        queryParams.append('paisProd', filters.paisProd);
+      }
+      if (filters.secado && filters.secado !== 'ALL') {
+        queryParams.append('secado', filters.secado);
+      }
+      if (filters.establecimiento && filters.establecimiento !== 'ALL') {
+        queryParams.append('establecimiento', filters.establecimiento);
+      }
+      if (filters.containsPalo !== undefined && filters.containsPalo !== 'ALL') {
+        queryParams.append('containsPalo', filters.containsPalo);
+      }
+      if (filters.leafCut && filters.leafCut !== 'ALL') {
+        queryParams.append('leafCut', filters.leafCut);
+      }
+      if (filters.tipoEstacionamiento && filters.tipoEstacionamiento !== 'ALL') {
+        queryParams.append('tipoEstacionamiento', filters.tipoEstacionamiento);
+      }
+      if (filters.produccion && filters.produccion !== 'ALL') {
+        queryParams.append('produccion', filters.produccion);
+      }
       
       // Filtros de tendencias específicos
       if (filters.metric) {
