@@ -7,6 +7,7 @@ import DashboardLayout from '../components/DashboardLayout.jsx';
 import ComingSoonPage from '../components/ComingSoonPage.jsx';
 import OverviewPage from '../dashboard/Overview/OverviewPage.jsx';
 import TrendsPage from '../dashboard/Trends/TrendsPage.jsx';
+import YerbasPage from '../dashboard/Yerbas/YerbasPage.jsx';
 
 // Componente PrivateRoute dummy (placeholder)
 const PrivateRoute = ({ children }) => {
@@ -37,15 +38,25 @@ const DashboardRoutes = () => {
         />
         
         {/* Ruta protegida del dashboard - Market Trends */}
-        <Route 
-          path="/dashboard/market-trends" 
+        <Route
+          path="/dashboard/market-trends"
           element={
             <PrivateRoute>
               <TrendsPage />
             </PrivateRoute>
-          } 
+          }
         />
-        
+
+        {/* Ruta protegida del dashboard - Yerbas */}
+        <Route
+          path="/dashboard/yerbas"
+          element={
+            <PrivateRoute>
+              <YerbasPage />
+            </PrivateRoute>
+          }
+        />
+
         {/* Ruta por defecto redirige al dashboard overview */}
         <Route path="/" element={<Navigate to="/dashboard/overview" replace />} />
         <Route path="/dashboard" element={<Navigate to="/dashboard/overview" replace />} />

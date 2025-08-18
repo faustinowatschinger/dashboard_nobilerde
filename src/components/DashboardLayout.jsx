@@ -25,7 +25,8 @@ import {
   Public,
   Group,
   NotificationsActive,
-  Analytics
+  Analytics,
+  Grass
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -43,6 +44,12 @@ const navigationItems = [
     path: '/dashboard/market-trends',
     icon: <TrendingUp />,
     description: 'Análisis de tendencias'
+  },
+  {
+    title: 'Listado de Yerbas',
+    path: '/dashboard/yerbas',
+    icon: <Grass />,
+    description: 'Métricas por yerba'
   },
   {
     title: 'Análisis de Sabores',
@@ -159,7 +166,7 @@ const DashboardLayout = ({ children }) => {
         <List sx={{ px: 2, py: 1 }}>
           {navigationItems.map((item) => {
             const isActive = location.pathname === item.path;
-            const isComingSoon = item.path !== '/dashboard/overview' && item.path !== '/dashboard/market-trends';
+            const isComingSoon = !['/dashboard/overview', '/dashboard/market-trends', '/dashboard/yerbas'].includes(item.path);
             
             return (
               <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
