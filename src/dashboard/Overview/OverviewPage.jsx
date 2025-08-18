@@ -27,7 +27,6 @@ import MetricCard from './MetricCard.jsx';
 import TrendLineChart from './TrendLineChart.jsx';
 import StackedBarsChart from './StackedBarsChart.jsx';
 import TopMoversTable from './TopMoversTable.jsx';
-import NotesTopChart from './NotesTopChart.jsx';
 import EmptyState from './EmptyState.jsx';
 import LoadingSkeleton from './LoadingSkeleton.jsx';
 import CacheInfo from './CacheInfo.jsx';
@@ -41,11 +40,8 @@ const OverviewPage = () => {
   // Estado del componente
   const [data, setData] = useState(null);
   const [comparisonData, setComparisonData] = useState(null);
-  const [notesTopData, setNotesTopData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [notesTopLoading, setNotesTopLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [notesTopError, setNotesTopError] = useState(null);
 
   // Zustand store - observar cambios en filtros específicos
   const {
@@ -156,22 +152,13 @@ const OverviewPage = () => {
 
     const loadData = async () => {
       setLoading(true);
-      setNotesTopLoading(true);
       setError(null);
-      setNotesTopError(null);
 
       try {
         console.log('📊 Cargando datos con comparación y filtros:', filters);
 
-        // Cargar ambos tipos de datos en paralelo
-        const [overviewData, notesTopResponseData] = await Promise.all([
-          metricsService.fetchOverviewWithComparison(filters),
-          metricsService.fetchNotesTopWithComparison(filters).catch(err => {
-            console.warn('Error cargando notas top:', err);
-            setNotesTopError(err.message || 'Error cargando notas sensoriales');
-            return null;
-          })
-        ]);
+        // Cargar datos de overview
+        const overviewData = await metricsService.fetchOverviewWithComparison(filters);
 
         console.log('✅ Datos de overview cargados exitosamente:', {
           current: {
@@ -182,14 +169,6 @@ const OverviewPage = () => {
           deltas: overviewData.deltas
         });
 
-        if (notesTopResponseData) {
-          console.log('✅ Datos de notas top cargados exitosamente:', {
-            notes: notesTopResponseData.notes?.length,
-            sample: notesTopResponseData.sample
-          });
-          setNotesTopData(notesTopResponseData);
-        }
-
         setData(overviewData.current);
         setComparisonData(overviewData);
       } catch (err) {
@@ -197,7 +176,6 @@ const OverviewPage = () => {
         setError(err.message || 'Error cargando datos del dashboard');
       } finally {
         setLoading(false);
-        setNotesTopLoading(false);
       }
     };
 
@@ -420,17 +398,6 @@ const OverviewPage = () => {
                   </Typography>
                   <TopMoversTable topMovers={data.topMovers || []} />
                 </Paper>
-              </Grid>
-            </Grid>
-
-            {/* Fila 4: Notas sensoriales top del período */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12 }}>
-                <NotesTopChart
-                  data={notesTopData}
-                  loading={notesTopLoading}
-                  error={notesTopError}
-                />
               </Grid>
             </Grid>
           </>

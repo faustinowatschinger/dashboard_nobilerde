@@ -26,7 +26,7 @@ const NotesTopChart = ({ data, loading, error }) => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Comentarios con más interacciones
+            Top 5 Comentarios por Engagement
           </Typography>
           <Box sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Typography color="text.secondary">Cargando...</Typography>
@@ -41,7 +41,7 @@ const NotesTopChart = ({ data, loading, error }) => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Comentarios con más interacciones
+            Top 5 Comentarios por Engagement
           </Typography>
           <EmptyState
             title="Error al cargar datos"
@@ -60,7 +60,7 @@ const NotesTopChart = ({ data, loading, error }) => {
       <Card>
         <CardContent>
           <Typography variant="h6" gutterBottom>
-            Comentarios con más interacciones
+            Top 5 Comentarios por Engagement
           </Typography>
           <EmptyState
             title="Sin datos disponibles"
@@ -78,6 +78,9 @@ const NotesTopChart = ({ data, loading, error }) => {
   return (
     <Card>
       <CardContent>
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 2 }}>
+          Top 5 Comentarios por Engagement
+        </Typography>
         
         <TableContainer>
           <Table>
@@ -155,7 +158,7 @@ const NotesTopChart = ({ data, loading, error }) => {
         </TableContainer>
         
         <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-          Muestra los 5 comentarios con mayor engagement basado en likes y respuestas
+          Ranking de los 5 comentarios con mayor engagement basado en likes y respuestas del período
         </Typography>
       </CardContent>
     </Card>

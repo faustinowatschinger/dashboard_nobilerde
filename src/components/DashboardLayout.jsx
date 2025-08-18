@@ -26,7 +26,8 @@ import {
   Group,
   NotificationsActive,
   Analytics,
-  Grass
+  Grass,
+  Comment
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -52,41 +53,11 @@ const navigationItems = [
     description: 'Métricas por yerba'
   },
   {
-    title: 'Análisis de Sabores',
-    path: '/dashboard/flavors',
-    icon: <LocalDrink />,
-    description: 'Perfiles de sabor'
+    title: 'Comentarios Top',
+    path: '/dashboard/notes',
+    icon: <Comment />,
+    description: 'Top 5 comentarios por engagement'
   },
-  {
-    title: 'Comparación de Marcas',
-    path: '/dashboard/brands',
-    icon: <BusinessCenter />,
-    description: 'Performance de marcas'
-  },
-  {
-    title: 'Descubrimiento vs Fidelidad',
-    path: '/dashboard/discovery',
-    icon: <Explore />,
-    description: 'Patrones de consumo'
-  },
-  {
-    title: 'Análisis Geográfico',
-    path: '/dashboard/geography',
-    icon: <Public />,
-    description: 'Distribución por regiones'
-  },
-  {
-    title: 'Análisis de Audiencia',
-    path: '/dashboard/audience',
-    icon: <Group />,
-    description: 'Demografía y comportamiento'
-  },
-  {
-    title: 'Alertas y Experimentos',
-    path: '/dashboard/alerts',
-    icon: <NotificationsActive />,
-    description: 'Monitoreo y tests'
-  }
 ];
 
 const DashboardLayout = ({ children }) => {
@@ -166,8 +137,8 @@ const DashboardLayout = ({ children }) => {
         <List sx={{ px: 2, py: 1 }}>
           {navigationItems.map((item) => {
             const isActive = location.pathname === item.path;
-            const isComingSoon = !['/dashboard/overview', '/dashboard/market-trends', '/dashboard/yerbas'].includes(item.path);
-            
+            const isComingSoon = !['/dashboard/overview', '/dashboard/market-trends', '/dashboard/yerbas', '/dashboard/notes'].includes(item.path);
+
             return (
               <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
                 <ListItemButton

@@ -185,6 +185,43 @@ export const metricsService = {
   },
 
   /**
+   * Obtiene las notas/comentarios top del período sin comparación
+   * @param {Object} filters - Filtros aplicados
+   * @returns {Promise<Object>} Datos de comentarios top
+   */
+  async fetchNotesTop(filters = {}) {
+    try {
+      // Formatear filtros para enviar al backend
+      const formattedFilters = apiClient.formatDateFilters(filters);
+      
+      console.log('📝 Fetching notes top data with filters:', formattedFilters);
+      
+      // Hacer request al backend
+      const data = await apiClient.get('/api/metrics/notes-top', formattedFilters);
+      
+      console.log('📝 Notes top data received:', {
+        notes: data?.notes?.length || 0,
+        sample: data?.sample
+      });
+
+      // Validar respuesta
+      if (!data || typeof data !== 'object') {
+        throw new Error('Formato de respuesta inválido del servidor');
+      }
+      
+      return {
+        notes: Array.isArray(data.notes) ? data.notes : [],
+        sample: data.sample || { nEvents: 0, nRatings: 0, kAnonymityOk: false },
+        _meta: data._meta || { cached: false, source: 'comments_interaction' }
+      };
+      
+    } catch (error) {
+      console.error('Error fetching notes top:', error);
+      throw new Error(`Error cargando comentarios top: ${error.message}`);
+    }
+  },
+
+  /**
    * Calcula los períodos actual y anterior basándose en los filtros
    * @param {Object} filters - Filtros aplicados
    * @returns {Object} Objeto con currentPeriod y previousPeriod
