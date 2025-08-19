@@ -2,18 +2,13 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Typography,
-  Paper,
-  Grid,
-  Button,
-  Collapse,
-  Chip
+  Chip,
+  Container
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import 'dayjs/locale/es';
 import NotesTopChart from '../Overview/NotesTopChart';
+import FiltersBar from '../Overview/FiltersBar.jsx';
 import { metricsService } from '../../services/metricsService.js';
 import useFiltersStore from '../store/filtersStore.js';
 
@@ -29,13 +24,10 @@ const NotesPage = () => {
   const {
     dateRange,
     timePeriod,
-    useCustomDates,
-    setTimePeriod,
-    setUseCustomDates,
-    setDateRange
+    useCustomDates
   } = useFiltersStore();
 
-  // Configuración de períodos de tiempo
+  // Configuración de períodos de tiempo para mostrar la etiqueta
   const timePeriods = [
     { value: 'dia', label: 'Hoy', icon: '🌅' },
     { value: 'semana', label: 'Últimos 7 días', icon: '📅' },
@@ -81,142 +73,30 @@ const NotesPage = () => {
     return () => clearTimeout(timeoutId);
   }, [dateRange, timePeriod, useCustomDates]);
 
-  // Manejadores de eventos
-  const handleTimePeriodChange = (newPeriod) => {
-    console.log('🔄 NotesPage - Cambiando período de:', timePeriod, 'a:', newPeriod);
-    setTimePeriod(newPeriod);
-    setUseCustomDates(false);
-  };
-
-  const handleCustomDatesToggle = () => {
-    setUseCustomDates(!useCustomDates);
-  };
-
-  const updateDateRange = (start, end) => {
-    setDateRange({ start, end });
-  };
-
-  const getPeriodoLabel = () => {
-    if (useCustomDates) {
-      return 'Período personalizado';
-    }
-    const period = timePeriods.find(p => p.value === timePeriod);
-    return period ? period.label : 'Últimas 4 semanas';
-  };
 
   return (
-    <Box>
-      <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
-        Top 5 Comentarios por Engagement
-      </Typography>
+    <Container 
+      maxWidth="xl" 
+      sx={{ 
+        py: { xs: 1, sm: 2, md: 3 },
+        px: { xs: 1, sm: 2, md: 3, lg: 4 },
+        width: '100%',
+        maxWidth: '100%',
+        mt: { xs: 8, sm: 9, md: 10 }
+      }}
+    >
       
-      {/* Filtros */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Grid container spacing={2} alignItems="center">
-          {/* Períodos predefinidos */}
-          <Grid item xs={12} sm={8} md={9}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-              Período de Tiempo
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-              {timePeriods.map((period) => (
-                <Button
-                  key={period.value}
-                  variant={timePeriod === period.value ? 'contained' : 'outlined'}
-                  size="small"
-                  onClick={() => handleTimePeriodChange(period.value)}
-                  sx={{ 
-                    minWidth: 'auto',
-                    px: 2,
-                    py: 1,
-                    borderRadius: 2
-                  }}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <span>{period.icon}</span>
-                    {period.label}
-                  </Box>
-                </Button>
-              ))}
-            </Box>
-          </Grid>
-
-          {/* Fechas personalizadas */}
-          <Grid item xs={12} sm={4} md={3}>
-            <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-              Personalizado
-            </Typography>
-            <Button
-              variant={useCustomDates ? 'contained' : 'outlined'}
-              size="small"
-              onClick={handleCustomDatesToggle}
-              fullWidth
-              sx={{ borderRadius: 2 }}
-            >
-              Fechas Personalizadas
-            </Button>
-          </Grid>
-        </Grid>
-
-        {/* Selector de fechas personalizadas */}
-        <Collapse in={useCustomDates}>
-          <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    label="Fecha de inicio"
-                    value={dateRange.start ? dayjs(dateRange.start) : null}
-                    onChange={(newValue) => updateDateRange(newValue, dateRange.end)}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        size: 'small',
-                        variant: 'outlined'
-                      }
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    label="Fecha de fin"
-                    value={dateRange.end ? dayjs(dateRange.end) : null}
-                    onChange={(newValue) => updateDateRange(dateRange.start, newValue)}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        size: 'small',
-                        variant: 'outlined'
-                      }
-                    }}
-                  />
-                </Grid>
-              </Grid>
-            </LocalizationProvider>
-          </Box>
-        </Collapse>
-      </Paper>
-
-      {/* Información del período activo */}
-      <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography variant="body2" color="text.secondary">
-          Mostrando comentarios de:
-        </Typography>
-        <Chip 
-          label={getPeriodoLabel()} 
-          size="small" 
-          color="primary" 
-          variant="outlined"
+      {/* Filtros de tiempo usando FiltersBar */}
+      <FiltersBar />
+      {/* Gráfico de comentarios top */}
+      <Box sx={{ width: '100%' }}>
+        <NotesTopChart 
+          data={notesData} 
+          loading={loading} 
+          error={error} 
         />
       </Box>
-
-      {/* Gráfico de comentarios top */}
-      <NotesTopChart 
-        data={notesData} 
-        loading={loading} 
-        error={error} 
-      />
-    </Box>
+    </Container>
   );
 };
 

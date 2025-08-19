@@ -20,41 +20,81 @@ const MetricSelector = ({ value, metric, onChange }) => {
   };
 
   return (
-    <FormControl component="fieldset" sx={{ mb: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-        <FormLabel component="legend">Métrica</FormLabel>
+    <FormControl component="fieldset" sx={{ mb: { xs: 1, sm: 2 }, width: '100%' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: { xs: 0.5, sm: 1 }, 
+        mb: { xs: 0.5, sm: 1 },
+        flexWrap: 'wrap'
+      }}>
+        <FormLabel component="legend" sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+          Métrica
+        </FormLabel>
         <Tooltip title={metricInfo[selected]?.description || "Selecciona una métrica para ver más información"}>
-          <InfoOutlined fontSize="small" color="action" />
+          <InfoOutlined 
+            fontSize="small" 
+            color="action" 
+            sx={{ fontSize: { xs: 16, sm: 20 } }} 
+          />
         </Tooltip>
       </Box>
       <RadioGroup
-        row
+        row={false}
         value={selected}
         onChange={handleChange}
+        sx={{
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 0.5, sm: 1 }
+        }}
       >
         <FormControlLabel 
           value="volumen" 
-          control={<Radio />} 
+          control={<Radio size="small" />} 
           label={
-            <Box>
-              <Typography variant="body2">Volumen</Typography>
-              <Typography variant="caption" color="text.secondary">
+            <Box sx={{ ml: { xs: 0, sm: 0.5 } }}>
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                Volumen
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+              >
                 Total eventos/interacciones
               </Typography>
             </Box>
           }
+          sx={{ 
+            mb: { xs: 0.5, sm: 0 },
+            '& .MuiFormControlLabel-label': {
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }
+          }}
         />
         <FormControlLabel 
           value="descubrimiento" 
-          control={<Radio />} 
+          control={<Radio size="small" />} 
           label={
-            <Box>
-              <Typography variant="body2">Descubrimiento</Typography>
-              <Typography variant="caption" color="text.secondary">
+            <Box sx={{ ml: { xs: 0, sm: 0.5 } }}>
+              <Typography variant="body2" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                Descubrimiento
+              </Typography>
+              <Typography 
+                variant="caption" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+              >
                 Yerbas probadas por primera vez
               </Typography>
             </Box>
           }
+          sx={{ 
+            mb: { xs: 0.5, sm: 0 },
+            '& .MuiFormControlLabel-label': {
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }
+          }}
         />
       </RadioGroup>
     </FormControl>

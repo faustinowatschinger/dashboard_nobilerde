@@ -16,6 +16,7 @@ import {
   Box,
   Typography,
   useTheme,
+  useMediaQuery,
   alpha,
   Chip,
   Alert
@@ -24,6 +25,19 @@ import { TrendingUp, TrendingDown, TrendingFlat, DonutLarge } from '@mui/icons-m
 
 const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  // Calcular altura del eje X basado en el número de elementos y el tamaño de pantalla
+  const getXAxisHeight = (dataLength) => {
+    const hasRotatedLabels = dataLength > 8;
+    if (hasRotatedLabels) {
+      return isMobile ? 50 : 60;
+    }
+    return isMobile ? 25 : 30;
+  };
+  
+  // Calcular tamaño de fuente para ticks
+  const getTickFontSize = () => isMobile ? 10 : 12;
 
   // Debug: Log de datos recibidos
   console.log('📊 TrendsComparisonChart - Props recibidas:', { trends, loading });
@@ -87,40 +101,98 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             bgcolor: 'background.paper',
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2,
-            p: 2,
+            p: { xs: 1.5, sm: 2 },
             boxShadow: theme.shadows[4],
-            minWidth: 250
+            minWidth: { xs: 200, sm: 250 },
+            maxWidth: { xs: 280, sm: 350 }
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 600, 
+              mb: { xs: 0.5, sm: 1 }, 
+              color: 'text.primary',
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              wordBreak: 'break-word'
+            }}
+          >
             {label}
           </Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: { xs: 0.5, sm: 1 }, 
+            mb: { xs: 0.5, sm: 1 } 
+          }}>
             {tendencyPercent > 0 ? (
-              <TrendingUp color="success" fontSize="small" />
+              <TrendingUp 
+                color="success" 
+                fontSize="small" 
+                sx={{ fontSize: { xs: 16, sm: 20 } }}
+              />
             ) : tendencyPercent < 0 ? (
-              <TrendingDown color="error" fontSize="small" />
+              <TrendingDown 
+                color="error" 
+                fontSize="small" 
+                sx={{ fontSize: { xs: 16, sm: 20 } }}
+              />
             ) : (
-              <TrendingFlat color="disabled" fontSize="small" />
+              <TrendingFlat 
+                color="disabled" 
+                fontSize="small" 
+                sx={{ fontSize: { xs: 16, sm: 20 } }}
+              />
             )}
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 600, 
+                color: 'text.primary',
+                fontSize: { xs: '0.875rem', sm: '1rem' }
+              }}
+            >
               {tendencyPercent > 0 ? '+' : ''}{tendencyPercent.toFixed(1)}%
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-            <Typography variant="caption" color="text.secondary">
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: { xs: 0.25, sm: 0.5 } 
+          }}>
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+            >
               Actual: <strong>{currentValue}</strong>
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+            >
               Anterior: <strong>{previousValue}</strong>
             </Typography>
-            <Typography variant="caption" color="text.secondary">
+            <Typography 
+              variant="caption" 
+              color="text.secondary"
+              sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+            >
               Cambio: <strong>{currentValue - previousValue}</strong>
             </Typography>
             {tendencyPercent === 0 && currentValue > 0 && (
-              <Typography variant="caption" color="info.main" sx={{ fontStyle: 'italic', mt: 0.5 }}>
+              <Typography 
+                variant="caption" 
+                color="info.main" 
+                sx={{ 
+                  fontStyle: 'italic', 
+                  mt: { xs: 0.25, sm: 0.5 },
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' }
+                }}
+              >
                 💡 Sin variación entre períodos
               </Typography>
             )}
@@ -181,7 +253,11 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     });
     
     return (
-      <Box sx={{ height: '100%', width: '100%' }}>
+      <Box sx={{ 
+        height: '100%', 
+        width: '100%',
+        minHeight: { xs: 200, sm: 250, md: 300 }
+      }}>
         <Box
           sx={{
             height: '100%',
@@ -192,14 +268,29 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             borderRadius: 2,
             border: `2px dashed ${theme.palette.divider}`,
             flexDirection: 'column',
-            gap: 2
+            gap: { xs: 1, sm: 2 },
+            p: { xs: 2, sm: 3 }
           }}
         >
-          <DonutLarge sx={{ fontSize: 48, color: 'text.disabled' }} />
-          <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center' }}>
+          <DonutLarge sx={{ 
+            fontSize: { xs: 32, sm: 40, md: 48 }, 
+            color: 'text.disabled' 
+          }} />
+          <Typography 
+            variant="body1" 
+            color="text.secondary" 
+            sx={{ 
+              textAlign: 'center',
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }}
+          >
             No hay datos de tendencias disponibles
             <br />
-            <Typography variant="caption" component="span">
+            <Typography 
+              variant="caption" 
+              component="span"
+              sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+            >
               {loading ? 'Cargando...' : 'Selecciona diferentes filtros o períodos'}
             </Typography>
           </Typography>
@@ -216,41 +307,78 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
     const hasVolumeData = chartData.some(d => d.currentValue > 0 || d.previousValue > 0);
     
     return (
-      <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
+      <Box sx={{ 
+        height: '100%', 
+        width: '100%', 
+        position: 'relative',
+        minHeight: { xs: 250, sm: 300, md: 350 }
+      }}>
         <Alert
           severity="info"
-          sx={{ mb: 2 }}
-          icon={<TrendingFlat />}
+          sx={{ 
+            mb: { xs: 1, sm: 2 },
+            '& .MuiAlert-message': {
+              fontSize: { xs: '0.875rem', sm: '1rem' }
+            }
+          }}
+          icon={<TrendingFlat sx={{ fontSize: { xs: 20, sm: 24 } }} />}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 600, 
+              mb: { xs: 0.5, sm: 1 },
+              fontSize: { xs: '0.9rem', sm: '1rem' }
+            }}
+          >
             Datos estables - Sin variación significativa
           </Typography>
-          <Typography variant="body2">
+          <Typography 
+            variant="body2"
+            sx={{ fontSize: { xs: '0.8rem', sm: '0.875rem' } }}
+          >
             {hasVolumeData
               ? 'Las entidades seleccionadas muestran valores estables entre períodos. Esto puede ocurrir cuando hay poca variación en los eventos de la métrica seleccionada.'
               : 'No se encontraron variaciones significativas en el período seleccionado.'
             }
           </Typography>
-          <Typography variant="caption" sx={{ display: 'block', mt: 1, fontStyle: 'italic' }}>
+          <Typography 
+            variant="caption" 
+            sx={{ 
+              display: 'block', 
+              mt: { xs: 0.5, sm: 1 }, 
+              fontStyle: 'italic',
+              fontSize: { xs: '0.7rem', sm: '0.75rem' }
+            }}
+          >
             💡 Sugerencia: Prueba cambiar la métrica o el período para ver más variación en los datos.
           </Typography>
         </Alert>
 
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height="90%">
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+            margin={{ 
+              top: 20, 
+              right: isMobile ? 15 : 30, 
+              left: isMobile ? 15 : 20, 
+              bottom: getXAxisHeight(chartData.length) + 10
+            }}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="entity"
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: getTickFontSize() }}
               interval={0}
               angle={chartData.length > 8 ? -45 : 0}
               textAnchor={chartData.length > 8 ? 'end' : 'middle'}
-              height={chartData.length > 8 ? 60 : 30}
+              height={getXAxisHeight(chartData.length)}
             />
-            <YAxis domain={[-1, 1]} tickFormatter={(value) => `${value.toFixed(0)}%`} />
+            <YAxis 
+              domain={[-1, 1]} 
+              tickFormatter={(value) => `${value.toFixed(0)}%`}
+              tick={{ fontSize: getTickFontSize() }}
+            />
             <Tooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke={theme.palette.divider} strokeWidth={2} />
 
@@ -313,35 +441,63 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
   });
 
   return (
-    <Box sx={{ height: '100%', width: '100%', position: 'relative' }}>
-      <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+    <Box sx={{ 
+      height: '100%', 
+      width: '100%', 
+      position: 'relative',
+      minHeight: { xs: 300, sm: 400, md: 500 }
+    }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: { xs: 0.5, sm: 1 }, 
+        mb: { xs: 1, sm: 2 }, 
+        flexWrap: 'wrap',
+        justifyContent: { xs: 'center', sm: 'flex-start' }
+      }}>
         <Chip
-          icon={<TrendingUp />}
+          icon={<TrendingUp sx={{ fontSize: { xs: 16, sm: 20 } }} />}
           label="Crecimiento"
           size="small"
           color="success"
           variant="outlined"
+          sx={{ 
+            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+            height: { xs: 24, sm: 32 }
+          }}
         />
         <Chip 
-          icon={<TrendingDown />} 
+          icon={<TrendingDown sx={{ fontSize: { xs: 16, sm: 20 } }} />} 
           label="Decrecimiento" 
           size="small" 
           color="error" 
           variant="outlined"
+          sx={{ 
+            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+            height: { xs: 24, sm: 32 }
+          }}
         />
         <Chip 
-          icon={<TrendingFlat />} 
+          icon={<TrendingFlat sx={{ fontSize: { xs: 16, sm: 20 } }} />} 
           label="Sin cambio" 
           size="small" 
           color="default" 
           variant="outlined"
+          sx={{ 
+            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+            height: { xs: 24, sm: 32 }
+          }}
         />
       </Box>
 
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height="90%">
         <BarChart
           data={chartData}
-          margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+          margin={{ 
+            top: 20, 
+            right: isMobile ? 15 : 30, 
+            left: isMobile ? 15 : 20, 
+            bottom: getXAxisHeight(chartData.length) + 10
+          }}
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
@@ -349,10 +505,14 @@ const TrendsComparisonChart = ({ trends = [], loading = false }) => {
             interval={0}
             angle={chartData.length > 8 ? -45 : 0}
             textAnchor={chartData.length > 8 ? 'end' : 'middle'}
-            height={chartData.length > 8 ? 60 : 30}
-            tick={{ fontSize: 12 }}
+            height={getXAxisHeight(chartData.length)}
+            tick={{ fontSize: getTickFontSize() }}
           />
-          <YAxis domain={yAxisDomain} tickFormatter={(value) => `${value.toFixed(0)}%`} />
+          <YAxis 
+            domain={yAxisDomain} 
+            tickFormatter={(value) => `${value.toFixed(0)}%`}
+            tick={{ fontSize: getTickFontSize() }}
+          />
           <Tooltip content={<CustomTooltip />} />
           
           <Bar dataKey="tendencyPercent">

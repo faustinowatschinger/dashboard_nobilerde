@@ -11,11 +11,18 @@ import {
   Cell,
   LabelList
 } from 'recharts';
-import { Box, Typography, useTheme, alpha, Chip } from '@mui/material';
+import { Box, Typography, useTheme, alpha, Chip, useMediaQuery } from '@mui/material';
 import { PieChart } from '@mui/icons-material';
 
 const StackedBarsChart = ({ typeBreakdown = [] }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Responsive values
+  const fontSize = isMobile ? 10 : isTablet ? 11 : 12;
+  const chartHeight = isMobile ? 300 : isTablet ? 350 : 400;
+  const bottomMargin = isMobile ? 60 : isTablet ? 70 : 80;
 
   // Debug: mostrar datos recibidos
   console.log('📊 StackedBarsChart - Datos recibidos:', typeBreakdown);
@@ -89,23 +96,78 @@ const StackedBarsChart = ({ typeBreakdown = [] }) => {
             bgcolor: 'background.paper',
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2,
-            p: 2,
+            p: { xs: 1.5, sm: 2 },
             boxShadow: theme.shadows[4],
-            minWidth: 200
+            minWidth: { xs: 160, sm: 200, md: 220 },
+            maxWidth: { xs: 240, sm: 280, md: 320 }
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 700, 
+              mb: 1, 
+              color: 'text.primary',
+              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
+            }}
+          >
             {label}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: data.color }} />
-            <Typography variant="body2" sx={{ flex: 1, color: 'text.secondary' }}>Porcentaje:</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>{data.percentage.toFixed(1)}%</Typography>
+            <Box sx={{ 
+              width: { xs: 8, sm: 10, md: 12 }, 
+              height: { xs: 8, sm: 10, md: 12 }, 
+              borderRadius: '50%', 
+              bgcolor: data.color 
+            }} />
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                flex: 1, 
+                color: 'text.secondary',
+                fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+              }}
+            >
+              Porcentaje:
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 700, 
+                color: 'text.primary',
+                fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+              }}
+            >
+              {data.percentage.toFixed(1)}%
+            </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: 'transparent' }} />
-            <Typography variant="body2" sx={{ flex: 1, color: 'text.secondary' }}>Cantidad:</Typography>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>{data.count}</Typography>
+            <Box sx={{ 
+              width: { xs: 8, sm: 10, md: 12 }, 
+              height: { xs: 8, sm: 10, md: 12 }, 
+              borderRadius: '50%', 
+              bgcolor: 'transparent' 
+            }} />
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                flex: 1, 
+                color: 'text.secondary',
+                fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+              }}
+            >
+              Cantidad:
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                fontWeight: 700, 
+                color: 'text.primary',
+                fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+              }}
+            >
+              {data.count}
+            </Typography>
           </Box>
         </Box>
       );
@@ -117,38 +179,64 @@ const StackedBarsChart = ({ typeBreakdown = [] }) => {
   const formatPercent = (v) => `${Number(v).toFixed(0)}%`;
 
   return (
-    <Box sx={{ height: '100%', width: '100%' }}>
+    <Box sx={{ 
+      height: '100%', 
+      width: '100%', 
+      px: { xs: 0, sm: 0.5, md: 1 },
+      py: { xs: 0, sm: 0.5 },
+      overflow: 'hidden',
+      minHeight: { xs: 180, sm: 220, md: 260, lg: 300 }
+    }}>
       {/* Información adicional */}
       {typeBreakdown.some(item => item.note) && (
-        <Box sx={{ mb: 2, p: 2, bgcolor: alpha(theme.palette.warning.main, 0.1), borderRadius: 2 }}>
-          <Typography variant="caption" color="warning.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ 
+          mb: { xs: 1, sm: 2 }, 
+          p: { xs: 1, sm: 1.5, md: 2 }, 
+          bgcolor: alpha(theme.palette.warning.main, 0.08), 
+          borderRadius: 2 
+        }}>
+          <Typography 
+            variant="caption" 
+            color="warning.main" 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1,
+              fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' }
+            }}
+          >
             ⚠️ Algunos datos provienen de períodos históricos debido a la falta de datos en el período actual
           </Typography>
         </Box>
       )}
 
       {/* Gráfico: barras verticales */}
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={chartHeight}>
         <BarChart
           data={chartData}
-          margin={{ top: 30, right: 30, left: 20, bottom: 80 }}
-          barCategoryGap="20%"
+          margin={{ 
+            top: isMobile ? 16 : isTablet ? 18 : 20, 
+            right: isMobile ? 16 : isTablet ? 18 : 20, 
+            left: isMobile ? 4 : isTablet ? 6 : 8, 
+            bottom: bottomMargin 
+          }}
+          barCategoryGap="18%"
         >
           <CartesianGrid strokeDasharray="3 3" stroke={alpha(theme.palette.divider, 0.3)} />
 
           <XAxis
             dataKey="name"
-            tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+            tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
             axisLine={{ stroke: theme.palette.divider }}
             tickLine={{ stroke: theme.palette.divider }}
             angle={-45}
             textAnchor="end"
-            height={80}
+            height={bottomMargin}
             interval={0}
           />
 
           <YAxis
-            tick={{ fontSize: 11, fill: theme.palette.text.secondary }}
+            tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
             axisLine={{ stroke: theme.palette.divider }}
             tickLine={{ stroke: theme.palette.divider }}
             tickFormatter={formatPercent}
@@ -159,20 +247,20 @@ const StackedBarsChart = ({ typeBreakdown = [] }) => {
 
           <Bar 
             dataKey="percentage" 
-            radius={[4, 4, 0, 0]}
-            maxBarSize={60}
+            radius={[6, 6, 4, 4]}
+            maxBarSize={isMobile ? 40 : isTablet ? 48 : 56}
           >
             {chartData.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} stroke={entry.color} strokeWidth={1} />
+              <Cell key={`cell-${index}`} fill={entry.color} stroke={alpha(entry.color, 0.9)} strokeWidth={1} />
             ))}
             <LabelList
               dataKey="percentage"
               position="top"
               formatter={(v) => `${v.toFixed(1)}%`}
               style={{ 
-                fontSize: 12, 
+                fontSize: fontSize, 
                 fill: theme.palette.text.primary, 
-                fontWeight: 600 
+                fontWeight: 700 
               }}
             />
           </Bar>

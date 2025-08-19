@@ -42,35 +42,104 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
   }, [entityType]);
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <FormControl size="small" sx={{ mr: 2, minWidth: 120 }}>
-        <InputLabel id="entity-type-label">Entidad</InputLabel>
-        <Select
-          labelId="entity-type-label"
-          value={entityType}
-          label="Entidad"
-          onChange={(e) => {
-            onEntityTypeChange(e.target.value);
-            onEntitiesChange([]);
+    <Box sx={{ mb: { xs: 1, sm: 2 }, width: '100%' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: { xs: 'column', sm: 'row' },
+        gap: { xs: 1, sm: 2 },
+        mb: { xs: 1, sm: 2 }
+      }}>
+        <FormControl size="small" sx={{ 
+          minWidth: { xs: '100%', sm: 120 },
+          flex: { xs: 1, sm: 'none' }
+        }}>
+          <InputLabel id="entity-type-label" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+            Entidad
+          </InputLabel>
+          <Select
+            labelId="entity-type-label"
+            value={entityType}
+            label="Entidad"
+            onChange={(e) => {
+              onEntityTypeChange(e.target.value);
+              onEntitiesChange([]);
+            }}
+            sx={{
+              fontSize: { xs: '0.875rem', sm: '1rem' },
+              '& .MuiOutlinedInput-input': {
+                py: { xs: 1, sm: 1.25 }
+              }
+            }}
+          >
+            <MenuItem value="tipo" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Tipo</MenuItem>
+            <MenuItem value="marca" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Marca</MenuItem>
+            <MenuItem value="yerbas" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Yerbas Específicas</MenuItem>
+            <MenuItem value="origen" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Origen</MenuItem>
+            <MenuItem value="paisProd" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>País</MenuItem>
+            <MenuItem value="secado" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Secado</MenuItem>
+            <MenuItem value="establecimiento" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Establecimiento</MenuItem>
+            <MenuItem value="containsPalo" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Con/Sin Palo</MenuItem>
+            <MenuItem value="leafCut" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Corte de Hoja</MenuItem>
+            <MenuItem value="tipoEstacionamiento" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Tipo Estacionamiento</MenuItem>
+            <MenuItem value="produccion" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>Producción</MenuItem>
+          </Select>
+        </FormControl>
+
+        <Autocomplete
+          multiple
+          value={entities}
+          onChange={(e, value) => {
+            if (value.length <= 5) {
+              onEntitiesChange(value);
+            }
           }}
-        >
-          <MenuItem value="tipo">Tipo</MenuItem>
-          <MenuItem value="marca">Marca</MenuItem>
-          <MenuItem value="yerbas">Yerbas Específicas</MenuItem>
-          <MenuItem value="origen">Origen</MenuItem>
-          <MenuItem value="paisProd">País</MenuItem>
-          <MenuItem value="secado">Secado</MenuItem>
-          <MenuItem value="establecimiento">Establecimiento</MenuItem>
-          <MenuItem value="containsPalo">Con/Sin Palo</MenuItem>
-          <MenuItem value="leafCut">Corte de Hoja</MenuItem>
-          <MenuItem value="tipoEstacionamiento">Tipo Estacionamiento</MenuItem>
-          <MenuItem value="produccion">Producción</MenuItem>
-        </Select>
-      </FormControl>
+          options={availableEntities}
+          loading={loading}
+          renderInput={(params) => (
+            <TextField 
+              {...params} 
+              label="Entidades" 
+              placeholder="Selecciona" 
+              size="small"
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+              sx={{
+                '& .MuiOutlinedInput-input': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  py: { xs: 1, sm: 1.25 }
+                },
+                '& .MuiInputLabel-root': {
+                  fontSize: { xs: '0.875rem', sm: '1rem' }
+                }
+              }}
+            />
+          )}
+          sx={{ 
+            width: { xs: '100%', sm: 300 },
+            flex: { xs: 1, sm: 'none' },
+            display: 'block'
+          }}
+          noOptionsText={loading ? "Cargando..." : "No hay opciones disponibles"}
+        />
+      </Box>
 
       {/* Información contextual sobre el tipo de entidad seleccionado */}
       {entityType && entityTypeInfo[entityType] && (
-        <Box sx={{ mb: 2, display: 'flex', gap: 1, alignItems: 'center' }}>
+        <Box sx={{ 
+          mb: { xs: 1, sm: 2 }, 
+          display: 'flex', 
+          gap: { xs: 0.5, sm: 1 }, 
+          alignItems: { xs: 'flex-start', sm: 'center' },
+          flexDirection: { xs: 'column', sm: 'row' },
+          flexWrap: 'wrap'
+        }}>
           <Chip 
             size="small" 
             label={`Variación: ${entityTypeInfo[entityType].variationLevel}`}
@@ -79,43 +148,20 @@ const EntitiesSelector = ({ entityType, entities, onEntityTypeChange, onEntities
               entityTypeInfo[entityType].variationLevel === 'Media' ? 'warning' : 'default'
             }
             variant="outlined"
+            sx={{ 
+              fontSize: { xs: '0.7rem', sm: '0.75rem' },
+              height: { xs: 24, sm: 32 }
+            }}
           />
-          <Typography variant="caption" color="text.secondary">
+          <Typography 
+            variant="caption" 
+            color="text.secondary"
+            sx={{ fontSize: { xs: '0.75rem', sm: '0.8rem' } }}
+          >
             {entityTypeInfo[entityType].note}
           </Typography>
         </Box>
       )}
-
-      <Autocomplete
-        multiple
-        value={entities}
-        onChange={(e, value) => {
-          if (value.length <= 5) {
-            onEntitiesChange(value);
-          }
-        }}
-        options={availableEntities}
-        loading={loading}
-        renderInput={(params) => (
-          <TextField 
-            {...params} 
-            label="Entidades" 
-            placeholder="Selecciona" 
-            size="small"
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? <CircularProgress color="inherit" size={20} /> : null}
-                  {params.InputProps.endAdornment}
-                </>
-              ),
-            }}
-          />
-        )}
-        sx={{ width: 300, display: 'inline-block' }}
-        noOptionsText={loading ? "Cargando..." : "No hay opciones disponibles"}
-      />
     </Box>
   );
 };

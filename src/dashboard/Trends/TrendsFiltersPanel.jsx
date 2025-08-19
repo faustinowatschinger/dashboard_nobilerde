@@ -56,21 +56,45 @@ const TrendsFiltersPanel = () => {
   ];
 
   return (
-    <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+    <Paper sx={{ 
+      p: { xs: 2, sm: 3 }, 
+      mb: { xs: 2, sm: 3, md: 4 }, 
+      borderRadius: 2, 
+      boxShadow: theme.shadows[1],
+      width: '100%'
+    }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
         {/* Título */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterList color="primary" />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: { xs: 0.5, sm: 1 },
+          flexWrap: 'wrap'
+        }}>
+          <FilterList color="primary" sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          <Typography variant="h6" sx={{ 
+            fontWeight: 600,
+            fontSize: { xs: '1.1rem', sm: '1.25rem' }
+          }}>
             Filtros de Análisis
           </Typography>
         </Box>
 
         {/* Selectores de filtros */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          flexWrap: 'wrap', 
+          gap: { xs: 1, sm: 2 },
+          '& .MuiFormControl-root': {
+            minWidth: { xs: 140, sm: 160 },
+            flex: { xs: '1 1 auto', sm: 'none' }
+          }
+        }}>
           {filterControls.map((ctrl) => (
-            <FormControl key={ctrl.key} size="small" sx={{ minWidth: 160 }}>
-              <InputLabel>{ctrl.label}</InputLabel>
+            <FormControl key={ctrl.key} size="small">
+              <InputLabel sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                {ctrl.label}
+              </InputLabel>
               <Select
                 value={filtersValues[ctrl.key] || ''}
                 label={ctrl.label}
@@ -78,10 +102,22 @@ const TrendsFiltersPanel = () => {
                   console.log(`🔄 Filtro ${ctrl.key} cambiado a:`, e.target.value);
                   setFilter(ctrl.key, e.target.value);
                 }}
+                sx={{
+                  fontSize: { xs: '0.875rem', sm: '1rem' },
+                  '& .MuiOutlinedInput-input': {
+                    py: { xs: 1, sm: 1.25 }
+                  }
+                }}
               >
-                <MenuItem value="">Todos</MenuItem>
+                <MenuItem value="" sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}>
+                  Todos
+                </MenuItem>
                 {ctrl.options.map((opt) => (
-                  <MenuItem key={opt.value || opt} value={opt.value || opt}>
+                  <MenuItem 
+                    key={opt.value || opt} 
+                    value={opt.value || opt}
+                    sx={{ fontSize: { xs: '0.875rem', sm: '1rem' } }}
+                  >
                     {opt.label || opt}
                   </MenuItem>
                 ))}
@@ -91,7 +127,7 @@ const TrendsFiltersPanel = () => {
         </Box>
 
         {/* Información de filtros activos */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 0.5, sm: 1 } }}>
           {Object.entries(filtersValues).map(([key, value]) => {
             if (!value) return null;
             const control = filterControls.find(c => c.key === key);
@@ -102,10 +138,11 @@ const TrendsFiltersPanel = () => {
                 sx={{
                   bgcolor: theme.palette.primary.main,
                   color: theme.palette.primary.contrastText,
-                  px: 1,
-                  py: 0.5,
+                  px: { xs: 0.75, sm: 1 },
+                  py: { xs: 0.25, sm: 0.5 },
                   borderRadius: 1,
-                  fontSize: '0.75rem'
+                  fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                  lineHeight: 1.2
                 }}
               >
                 {control?.label}: {value}

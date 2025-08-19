@@ -134,34 +134,41 @@ const TopMoversTable = ({ topMovers = [] }) => {
   };
 
   return (
-    <Box sx={{ height: '100%', width: '100%' }}>
+    <Box sx={{ width: '100%', overflow: 'auto' }}>
       <TableContainer 
         component={Paper} 
         sx={{ 
-          height: 'calc(100% - 60px)',
+          height: { xs: 'auto', md: 'calc(100% - 60px)' },
           bgcolor: 'transparent',
-          boxShadow: 'none'
+          boxShadow: 'none',
+          borderRadius: 2,
+          overflow: 'auto',
+          maxHeight: { xs: 400, sm: 450, md: 'none' }
         }}
       >
-        <Table stickyHeader size="small">
+         <Table stickyHeader size="small">
           <TableHead>
             <TableRow>
               <TableCell 
                 sx={{ 
-                  fontWeight: 600, 
+                  fontWeight: 700, 
                   color: 'text.primary',
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `2px solid ${theme.palette.primary.main}`
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                  py: { xs: 0.5, sm: 1 }
                 }}
               >
-                Posición
+                Pos.
               </TableCell>
               <TableCell 
                 sx={{ 
-                  fontWeight: 600, 
+                  fontWeight: 700, 
                   color: 'text.primary',
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `2px solid ${theme.palette.primary.main}`
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                  py: { xs: 0.5, sm: 1 }
                 }}
               >
                 Yerba
@@ -169,10 +176,12 @@ const TopMoversTable = ({ topMovers = [] }) => {
               <TableCell 
                 align="center"
                 sx={{ 
-                  fontWeight: 600, 
+                  fontWeight: 700, 
                   color: 'text.primary',
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `2px solid ${theme.palette.primary.main}`
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                  py: { xs: 0.5, sm: 1 }
                 }}
               >
                 Score
@@ -180,10 +189,12 @@ const TopMoversTable = ({ topMovers = [] }) => {
               <TableCell 
                 align="center"
                 sx={{ 
-                  fontWeight: 600, 
+                  fontWeight: 700, 
                   color: 'text.primary',
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `2px solid ${theme.palette.primary.main}`
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                  py: { xs: 0.5, sm: 1 }
                 }}
               >
                 Cambio
@@ -191,10 +202,12 @@ const TopMoversTable = ({ topMovers = [] }) => {
               <TableCell 
                 align="center"
                 sx={{ 
-                  fontWeight: 600, 
+                  fontWeight: 700, 
                   color: 'text.primary',
-                  bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  borderBottom: `2px solid ${theme.palette.primary.main}`
+                  bgcolor: alpha(theme.palette.primary.main, 0.04),
+                  borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.12)}`,
+                  fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                  py: { xs: 0.5, sm: 1 }
                 }}
               >
                 Tipo
@@ -207,76 +220,101 @@ const TopMoversTable = ({ topMovers = [] }) => {
                 key={item.yerbaId || item.id || item.name || index}
                 sx={{ 
                   '&:hover': { 
-                    bgcolor: alpha(theme.palette.primary.main, 0.02) 
+                    bgcolor: alpha(theme.palette.primary.main, 0.03) 
                   },
                   '&:nth-of-type(odd)': { 
                     bgcolor: alpha(theme.palette.background.paper, 0.5) 
-                  }
+                  },
+                  td: { borderBottom: 'none' },
+                  '& td': { py: { xs: 0.8, md: 1.2 } }
                 }}
               >
                 <TableCell 
                   sx={{ 
-                    fontWeight: 600,
+                    fontWeight: 700,
                     color: index < 3 ? 'primary.main' : 'text.secondary',
-                    fontSize: index < 3 ? '1.1rem' : 'inherit'
+                    fontSize: { xs: '0.8rem', sm: '0.9rem', md: index < 3 ? '1.05rem' : 'inherit' },
+                    py: { xs: 0.5, sm: 0.8, md: 1.2 }
                   }}
                 >
                   #{index + 1}
                 </TableCell>
                 
-                <TableCell>
+                <TableCell sx={{ py: { xs: 0.5, sm: 0.8, md: 1.2 } }}>
                   <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    <Typography 
+                      variant="body2" 
+                      sx={{ 
+                        fontWeight: 700, 
+                        color: 'text.primary',
+                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }
+                      }}
+                    >
                       {getYerbaName(item)}
                     </Typography>
                     {getYerbaType(item) && (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography 
+                        variant="caption" 
+                        color="text.secondary"
+                        sx={{ fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' } }}
+                      >
                         {getYerbaType(item)}
                       </Typography>
                     )}
                   </Box>
                 </TableCell>
                 
-                <TableCell align="center">
+                <TableCell align="center" sx={{ py: { xs: 0.5, sm: 0.8, md: 1.2 } }}>
                   <Typography 
                     variant="body2" 
                     sx={{ 
-                      fontWeight: 600,
+                      fontWeight: 700,
                       color: getCurrentScore(item) > 7 ? 'success.main' : 
-                             getCurrentScore(item) > 5 ? 'warning.main' : 'text.secondary'
+                             getCurrentScore(item) > 5 ? 'warning.main' : 'text.secondary',
+                      fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }
                     }}
                   >
                     {formatScore(getCurrentScore(item))}
                   </Typography>
                 </TableCell>
                 
-                <TableCell align="center">
+                <TableCell align="center" sx={{ py: { xs: 0.5, sm: 0.8, md: 1.2 } }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
                     {getChangeIcon(getChangeType(item))}
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
-                        fontWeight: 600,
-                        color: getChangeColor(getChangeType(item)) === 'success' ? 'success.main' :
-                               getChangeColor(getChangeType(item)) === 'error' ? 'error.main' :
-                               getChangeColor(getChangeType(item)) === 'warning' ? 'warning.main' : 'text.secondary'
+                    <Chip
+                      label={getChangeText(getChangeType(item), getChangeValue(item))}
+                      size="small"
+                      color={getChangeColor(getChangeType(item))}
+                      variant="outlined"
+                      sx={{
+                        height: { xs: 20, sm: 24, md: 28 },
+                        fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' },
+                        fontWeight: 700,
+                        borderRadius: 1.5,
+                        '& .MuiChip-label': {
+                          px: { xs: 0.5, sm: 1 }
+                        }
                       }}
-                    >
-                      {getChangeText(getChangeType(item), getChangeValue(item))}
-                    </Typography>
+                    />
                   </Box>
                 </TableCell>
                 
-                <TableCell align="center">
+                <TableCell align="center" sx={{ py: { xs: 0.5, sm: 0.8, md: 1.2 } }}>
                   <Chip
-                    label={getChangeType(item) || 'unknown'}
+                    label={getYerbaType(item) || 'Sin tipo'}
                     size="small"
-                    color={getChangeColor(getChangeType(item))}
-                    variant="outlined"
-                    sx={{ 
-                      textTransform: 'capitalize',
-                      fontSize: '0.7rem',
-                      fontWeight: 600
+                    variant="filled"
+                    color="default"
+                    sx={{
+                      fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.75rem' },
+                      height: { xs: 20, sm: 24, md: 28 },
+                      fontWeight: 600,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(theme.palette.grey[500], 0.12),
+                      color: 'text.secondary',
+                      '& .MuiChip-label': {
+                        px: { xs: 0.5, sm: 1 }
+                      }
                     }}
                   />
                 </TableCell>
@@ -284,9 +322,9 @@ const TopMoversTable = ({ topMovers = [] }) => {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
-    </Box>
-  );
-};
-
-export default TopMoversTable;
+       </TableContainer>
+     </Box>
+   );
+ };
+ 
+ export default TopMoversTable;
