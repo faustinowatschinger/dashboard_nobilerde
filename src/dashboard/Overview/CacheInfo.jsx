@@ -116,7 +116,7 @@ const CacheInfo = ({ data }) => {
 
   return (
     <>
-      <Box display="flex" alignItems="center" gap={1}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <Chip
           size="small"
           color={getChipColor()}
@@ -164,6 +164,7 @@ const CacheInfo = ({ data }) => {
                 color="warning"
                 variant="outlined"
                 size="small"
+                sx={{ ml: 1 }}
               >
                 Limpiar Cache
               </Button>
@@ -179,7 +180,7 @@ const CacheInfo = ({ data }) => {
           )}
 
           <Box mb={3}>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
               Estado Actual
             </Typography>
             <List>
@@ -206,7 +207,7 @@ const CacheInfo = ({ data }) => {
 
           {cacheStats && (
             <Box>
-              <Typography variant="h6" gutterBottom>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 700 }}>
                 Estadísticas del Cache
               </Typography>
               <List>

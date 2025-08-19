@@ -160,68 +160,144 @@ const TrendsPage = () => {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      {/* Barra de filtros temporales */}
-      <Paper sx={{ p: 3, mb: 4, borderRadius: 2, marginTop: 10, boxShadow: theme.shadows[1] }}>
+    <Container 
+      maxWidth="xl" 
+      sx={{ 
+        py: { xs: 1, sm: 2, md: 3 },
+        px: { xs: 1, sm: 2, md: 3, lg: 4 },
+        width: '100%',
+        maxWidth: '100%'
+      }}
+    >
         <FiltersBar />
-      </Paper>
 
       {/* Panel de filtros de análisis */}
-      <TrendsFiltersPanel />
+      <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+        <TrendsFiltersPanel />
+      </Box>
 
       {/* Error */}
       {error && (
-        <Alert severity="error" sx={{ mb: 4 }}>
-          {error}
-          <Button size="small" onClick={handleRefresh} sx={{ ml: 2 }}>
-            Reintentar
-          </Button>
+        <Alert severity="error" sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>
+          <Box sx={{ 
+            display: 'flex', 
+            flexDirection: { xs: 'column', sm: 'row' }, 
+            alignItems: { xs: 'flex-start', sm: 'center' },
+            gap: { xs: 1, sm: 0 }
+          }}>
+            <Typography sx={{ flex: 1, fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+              {error}
+            </Typography>
+            <Button 
+              size="small" 
+              onClick={handleRefresh} 
+              sx={{ 
+                ml: { xs: 0, sm: 2 },
+                mt: { xs: 1, sm: 0 },
+                minWidth: { xs: 'auto', sm: 'fit-content' }
+              }}
+            >
+              Reintentar
+            </Button>
+          </Box>
         </Alert>
       )}
 
       {/* Controles específicos de tendencias */}
-      <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Paper sx={{ 
+        p: { xs: 2, sm: 3 }, 
+        mb: { xs: 2, sm: 3, md: 4 }, 
+        borderRadius: 2, 
+        boxShadow: theme.shadows[1],
+        width: '100%'
+      }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, sm: 3 } }}>
           {/* Título */}
           <Box>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
+            <Typography variant="h6" sx={{ 
+              mb: 1, 
+              fontWeight: 600,
+              fontSize: { xs: '1.1rem', sm: '1.25rem' }
+            }}>
               Tendencias Comparativas
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{
+              fontSize: { xs: '0.8rem', sm: '0.875rem' }
+            }}>
               Análisis de cambios porcentuales entre períodos
             </Typography>
           </Box>
 
           {/* Selectores de métrica y entidades */}
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <MetricSelector value={metric} onChange={setMetric} />
-            <EntitiesSelector 
-              entityType={entityType}
-              onEntityTypeChange={setEntityType}
-              entities={entities}
-              onEntitiesChange={setEntities}
-            />
+          <Box sx={{ 
+            display: 'flex', 
+            gap: { xs: 1, sm: 2 }, 
+            flexWrap: 'wrap',
+            flexDirection: { xs: 'column', sm: 'row' }
+          }}>
+            <Box sx={{ flex: { xs: 1, sm: 'none' }, minWidth: { xs: '100%', sm: 200 } }}>
+              <MetricSelector value={metric} onChange={setMetric} />
+            </Box>
+            <Box sx={{ flex: { xs: 1, sm: 'none' }, minWidth: { xs: '100%', sm: 300 } }}>
+              <EntitiesSelector 
+                entityType={entityType}
+                onEntityTypeChange={setEntityType}
+                entities={entities}
+                onEntitiesChange={setEntities}
+              />
+            </Box>
           </Box>
         </Box>
       </Paper>
 
       {/* Loading */}
       {loading && (
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
+        <Paper sx={{ 
+          p: { xs: 2, sm: 3 }, 
+          mb: { xs: 2, sm: 3, md: 4 }, 
+          borderRadius: 2, 
+          boxShadow: theme.shadows[1],
+          width: '100%'
+        }}>
           <LoadingSkeleton />
         </Paper>
       )}
 
       {/* Gráfico de tendencias comparativas */}
       {trendsData && !loading && (
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Paper sx={{ 
+          p: { xs: 2, sm: 3 }, 
+          mb: { xs: 2, sm: 3, md: 4 }, 
+          borderRadius: 2, 
+          boxShadow: theme.shadows[1],
+          width: '100%'
+        }}>
+          <Box sx={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: { xs: 'flex-start', sm: 'center' }, 
+            mb: { xs: 2, sm: 3 },
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: { xs: 1, sm: 0 }
+          }}>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                <CompareArrows sx={{ mr: 1, verticalAlign: 'middle' }} />
-                Tendencias Comparativas - {metric.charAt(0).toUpperCase() + metric.slice(1)}
+              <Typography variant="h6" sx={{ 
+                fontWeight: 600, 
+                color: 'text.primary',
+                fontSize: { xs: '1.1rem', sm: '1.25rem' },
+                display: 'flex',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: 1
+              }}>
+                <CompareArrows sx={{ mr: { xs: 0.5, sm: 1 }, verticalAlign: 'middle' }} />
+                <Box component="span" sx={{ display: { xs: 'block', sm: 'inline' } }}>
+                  Tendencias Comparativas - {metric.charAt(0).toUpperCase() + metric.slice(1)}
+                </Box>
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" color="text.secondary" sx={{
+                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+              }}>
                 Comparación de período actual vs anterior por {entityType}
               </Typography>
             </Box>
@@ -234,7 +310,11 @@ const TrendsPage = () => {
             />
           </Box>
           
-          <Box sx={{ height: 500, width: '100%' }}>
+          <Box sx={{ 
+            height: { xs: 300, sm: 400, md: 500 }, 
+            width: '100%',
+            overflow: 'hidden'
+          }}>
             {console.log('🎯 TrendsPage - Pasando datos al chart:', { 
               trends: trendsData.trends, 
               trendsLength: trendsData.trends?.length,
@@ -250,16 +330,34 @@ const TrendsPage = () => {
 
       {/* Estado vacío */}
       {!trendsData && !loading && !error && (
-        <EmptyState 
-          title="No hay datos de tendencias disponibles"
-          description="Configura los filtros y métricas para visualizar las tendencias"
-          action={
-            <Button variant="contained" onClick={handleRefresh}>
-              <Refresh sx={{ mr: 1 }} />
-              Cargar Datos
-            </Button>
-          }
-        />
+        <Box sx={{ 
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: { xs: 200, sm: 250, md: 300 },
+          width: '100%'
+        }}>
+          <EmptyState 
+            title="No hay datos de tendencias disponibles"
+            description="Configura los filtros y métricas para visualizar las tendencias"
+            action={
+              <Button 
+                variant="contained" 
+                onClick={handleRefresh}
+                size="medium"
+                sx={{ 
+                  minWidth: { xs: 'auto', sm: 'fit-content' },
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  px: { xs: 2, sm: 3 },
+                  py: { xs: 0.75, sm: 1 }
+                }}
+              >
+                <Refresh sx={{ mr: 1, fontSize: { xs: 16, sm: 20 } }} />
+                Cargar Datos
+              </Button>
+            }
+          />
+        </Box>
       )}
     </Container>
   );

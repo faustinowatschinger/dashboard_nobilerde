@@ -25,6 +25,10 @@ const EmptyState = ({
 }) => {
   const theme = useTheme();
 
+  // Use title and description props, ignore unused ones
+  const displayTitle = title || "No hay datos";
+  const displayDescription = description || "Intenta cambiar los filtros o el rango de fechas.";
+
   // Configuración según el variant
   const getVariantConfig = () => {
     switch (variant) {
@@ -32,43 +36,43 @@ const EmptyState = ({
         return {
           icon: <Search sx={{ fontSize: 64, color: theme.palette.info.main }} />,
           color: theme.palette.info.main,
-          bgColor: alpha(theme.palette.info.main, 0.05)
+          bgColor: alpha(theme.palette.info.main, 0.04)
         };
       case "filters":
         return {
           icon: <FilterList sx={{ fontSize: 64, color: theme.palette.warning.main }} />,
           color: theme.palette.warning.main,
-          bgColor: alpha(theme.palette.warning.main, 0.05)
+          bgColor: alpha(theme.palette.warning.main, 0.04)
         };
       case "refresh":
         return {
           icon: <Refresh sx={{ fontSize: 64, color: theme.palette.primary.main }} />,
           color: theme.palette.primary.main,
-          bgColor: alpha(theme.palette.primary.main, 0.05)
+          bgColor: alpha(theme.palette.primary.main, 0.04)
         };
       case "error":
         return {
           icon: <Error sx={{ fontSize: 64, color: theme.palette.error.main }} />,
           color: theme.palette.error.main,
-          bgColor: alpha(theme.palette.error.main, 0.05)
+          bgColor: alpha(theme.palette.error.main, 0.04)
         };
       case "privacy":
         return {
           icon: <PrivacyTip sx={{ fontSize: 64, color: theme.palette.warning.main }} />,
           color: theme.palette.warning.main,
-          bgColor: alpha(theme.palette.warning.main, 0.05)
+          bgColor: alpha(theme.palette.warning.main, 0.04)
         };
       case "empty":
         return {
           icon: <Inbox sx={{ fontSize: 64, color: theme.palette.grey[500] }} />,
           color: theme.palette.grey[500],
-          bgColor: alpha(theme.palette.grey[500], 0.05)
+          bgColor: alpha(theme.palette.grey[500], 0.04)
         };
       default:
         return {
           icon: <Inbox sx={{ fontSize: 64, color: theme.palette.grey[500] }} />,
           color: theme.palette.grey[500],
-          bgColor: alpha(theme.palette.grey[500], 0.05)
+          bgColor: alpha(theme.palette.grey[500], 0.04)
         };
     }
   };
@@ -76,88 +80,36 @@ const EmptyState = ({
   const config = getVariantConfig();
 
   return (
-    <Box
-      sx={{
-        minHeight: '60vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        py: 8
-      }}
-    >
-      <Paper
-        sx={{
-          p: 6,
-          textAlign: 'center',
-          maxWidth: 500,
-          mx: 'auto',
-          borderRadius: 3,
-          boxShadow: theme.shadows[2],
-          border: `1px solid ${alpha(config.color, 0.1)}`,
-          bgcolor: config.bgColor
-        }}
-      >
-        {/* Icono */}
-        <Box sx={{ mb: 3 }}>
-          {config.icon}
+    <Box sx={{ 
+      py: { xs: 4, sm: 5, md: 6 }, 
+      px: { xs: 2, sm: 3 },
+      textAlign: 'center', 
+      width: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: { xs: 200, sm: 250, md: 300 }
+    }}>
+      {config.icon}
+      <Typography variant="h6" sx={{ 
+        mb: 1,
+        mt: 2,
+        fontSize: { xs: '1.1rem', sm: '1.25rem' }
+      }}>
+        {displayTitle}
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{
+        fontSize: { xs: '0.8rem', sm: '0.875rem' },
+        maxWidth: { xs: '90%', sm: '70%' }
+      }}>
+        {displayDescription}
+      </Typography>
+      {action && (
+        <Box sx={{ mt: 3 }}>
+          {action}
         </Box>
-
-        {/* Título */}
-        <Typography
-          variant="h4"
-          component="h2"
-          sx={{
-            fontWeight: 700,
-            color: 'text.primary',
-            mb: 2,
-            lineHeight: 1.2
-          }}
-        >
-          {title}
-        </Typography>
-
-        {/* Descripción */}
-        <Typography
-          variant="body1"
-          color="text.secondary"
-          sx={{
-            mb: 4,
-            lineHeight: 1.6,
-            maxWidth: 400,
-            mx: 'auto'
-          }}
-        >
-          {description}
-        </Typography>
-
-        {/* Acción */}
-        {action && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
-            {action}
-          </Box>
-        )}
-
-        {/* Información adicional */}
-        <Box sx={{ mt: 4, p: 3, bgcolor: alpha(theme.palette.background.paper, 0.7), borderRadius: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            💡 Consejos para obtener datos:
-          </Typography>
-          <Box sx={{ textAlign: 'left', maxWidth: 400, mx: 'auto' }}>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              • Verifica que los filtros de fecha estén configurados correctamente
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              • Intenta con períodos de tiempo más amplios
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              • Asegúrate de que haya actividad en la plataforma
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              • Contacta al administrador si el problema persiste
-            </Typography>
-          </Box>
-        </Box>
-      </Paper>
+      )}
     </Box>
   );
 };

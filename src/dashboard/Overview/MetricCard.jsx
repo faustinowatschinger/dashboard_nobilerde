@@ -27,6 +27,7 @@ const MetricCard = ({
   icon,
   color = 'primary',
   size = 'medium'
+  , sx
 }) => {
   const theme = useTheme();
 
@@ -44,9 +45,24 @@ const MetricCard = ({
 
   // Tamaños del card
   const sizeMap = {
-    small: { height: 120, iconSize: 24, valueSize: 'h5', titleSize: 'body2' },
-    medium: { height: 140, iconSize: 32, valueSize: 'h4', titleSize: 'body1' },
-    large: { height: 160, iconSize: 40, valueSize: 'h3', titleSize: 'h6' }
+    small: { 
+      height: { xs: 100, sm: 120 }, 
+      iconSize: { xs: 20, sm: 24 }, 
+      valueSize: { xs: 'h6', sm: 'h5' }, 
+      titleSize: { xs: 'caption', sm: 'body2' }
+    },
+    medium: { 
+      height: { xs: 110, sm: 140 }, 
+      iconSize: { xs: 24, sm: 32 }, 
+      valueSize: { xs: 'h5', sm: 'h4' }, 
+      titleSize: { xs: 'body2', sm: 'body1' }
+    },
+    large: { 
+      height: { xs: 120, sm: 160 }, 
+      iconSize: { xs: 32, sm: 40 }, 
+      valueSize: { xs: 'h4', sm: 'h3' }, 
+      titleSize: { xs: 'body1', sm: 'h6' }
+    }
   };
 
   const selectedSize = sizeMap[size] || sizeMap.medium;
@@ -80,14 +96,14 @@ const MetricCard = ({
     return (
       <Paper 
         sx={{ 
-          p: 3, 
-          height: selectedSize.height, 
+          p: { xs: 1, sm: 2, md: 3 }, 
+          minHeight: { xs: 90, sm: 110, md: selectedSize.height }, 
           borderRadius: 2,
           boxShadow: theme.shadows[1],
-          bgcolor: 'background.paper'
+          bgcolor: theme.palette.common.white
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
           <Skeleton variant="circular" width={selectedSize.iconSize} height={selectedSize.iconSize} />
           <Skeleton variant="text" width="60%" sx={{ ml: 2 }} />
         </Box>
@@ -98,40 +114,48 @@ const MetricCard = ({
   }
 
   return (
-    <Paper 
-      sx={{ 
-        p: 3, 
-        height: selectedSize.height, 
-        borderRadius: 2,
-        boxShadow: theme.shadows[1],
-        bgcolor: 'background.paper',
-        border: `1px solid ${alpha(selectedColor.main, 0.1)}`,
-        transition: 'all 0.3s ease-in-out',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: theme.shadows[4],
-          borderColor: alpha(selectedColor.main, 0.3)
-        }
-      }}
-    >
+    <Paper
+  sx={[
+    {
+      p: { xs: 1, sm: 2, md: 3 },
+      minHeight: { xs: 90, sm: 110, md: selectedSize.height },
+      borderRadius: 2,
+      boxShadow: theme.shadows[1],
+      bgcolor: theme.palette.common.white, // 🔥 fondo blanco sólido
+      border: `1px solid ${alpha(selectedColor.main, 0.08)}`,
+      transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: theme.shadows[6],
+        borderColor: alpha(selectedColor.main, 0.22),
+      },
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
+    sx,
+  ]}
+>
+
       {/* Header con icono y título */}
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 0.5, sm: 1, md: 2 } }}>
         {icon && (
           <Box 
             sx={{ 
               display: 'flex', 
               alignItems: 'center', 
               justifyContent: 'center',
-              width: selectedSize.iconSize + 8,
-              height: selectedSize.iconSize + 20,
-              borderRadius: '50%',
-              bgcolor: alpha(selectedColor.main, 0.1),
+              width: { xs: 28, sm: 36, md: selectedSize.iconSize + 12 },
+              height: { xs: 28, sm: 36, md: selectedSize.iconSize + 12 },
+              borderRadius: 2,
+              bgcolor: alpha(selectedColor.main, 0.12),
               color: selectedColor.main,
-              mr: 2
+              mr: { xs: 1, sm: 2 },
+              boxShadow: `inset 0 -2px 0 ${alpha(selectedColor.dark || selectedColor.main, 0.03)}`
             }}
           >
             {React.cloneElement(icon, { 
-              sx: { fontSize: selectedSize.iconSize } 
+              sx: { fontSize: { xs: 16, sm: 20, md: selectedSize.iconSize } } 
             })}
           </Box>
         )}
@@ -141,16 +165,18 @@ const MetricCard = ({
             variant={selectedSize.titleSize} 
             color="text.secondary" 
             sx={{ 
-              fontWeight: 500,
+              fontWeight: 600,
               display: 'flex',
               alignItems: 'center',
-              gap: 0.5
+              gap: 0.5,
+              letterSpacing: '0.2px',
+              fontSize: { xs: '0.7rem', sm: '0.8rem', md: 'inherit' }
             }}
           >
             {title}
             {hint && (
               <Tooltip title={hint} arrow placement="top">
-                <InfoOutlined sx={{ fontSize: 16, opacity: 0.6, cursor: 'help' }} />
+                <InfoOutlined sx={{ fontSize: { xs: 12, sm: 14, md: 16 }, opacity: 0.7, cursor: 'help' }} />
               </Tooltip>
             )}
           </Typography>
@@ -163,8 +189,9 @@ const MetricCard = ({
         sx={{ 
           fontWeight: 700, 
           color: 'text.primary',
-          mb: 1,
-          lineHeight: 1.2
+          mb: { xs: 0.5, sm: 1 },
+          lineHeight: 1.1,
+          fontSize: { xs: '1.1rem', sm: '1.25rem', md: 'inherit' }
         }}
       >
         {value}
@@ -172,7 +199,7 @@ const MetricCard = ({
 
       {/* Delta text como Chip si existe */}
       {deltaText && (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: { xs: 0.5, sm: 1 } }}>
           <Chip
             icon={getTrendIcon(trend)}
             label={deltaText}
@@ -180,12 +207,12 @@ const MetricCard = ({
             color={getTrendColor(trend)}
             variant="outlined"
             sx={{
-              height: 24,
-              fontSize: '0.75rem',
-              fontWeight: 600,
+              height: { xs: 24, sm: 28 },
+              fontSize: { xs: '0.65rem', sm: '0.75rem', md: '0.78rem' },
+              fontWeight: 700,
+              borderRadius: 1.5,
               '& .MuiChip-icon': {
-                fontSize: 14,
-                marginLeft: '4px'
+                fontSize: { xs: 12, sm: 14 }
               }
             }}
           />
@@ -198,10 +225,11 @@ const MetricCard = ({
           variant="caption" 
           color="text.secondary"
           sx={{ 
-            opacity: 0.8,
-            lineHeight: 1.4,
+            opacity: 0.9,
+            lineHeight: 1.5,
             display: 'block',
-            mt: 1
+            mt: { xs: 0.5, sm: 1 },
+            fontSize: { xs: '0.6rem', sm: '0.7rem', md: 'inherit' }
           }}
         >
           {hint}

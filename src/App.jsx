@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import palette from './theme/palette.js';
 import DashboardRoutes from './routes/DashboardRoutes.jsx';
+import './landing/LandingPage.css';
 
 // Crear tema de Material-UI con nuestra paleta
 const theme = createTheme({

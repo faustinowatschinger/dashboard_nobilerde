@@ -27,7 +27,6 @@ import MetricCard from './MetricCard.jsx';
 import TrendLineChart from './TrendLineChart.jsx';
 import StackedBarsChart from './StackedBarsChart.jsx';
 import TopMoversTable from './TopMoversTable.jsx';
-import NotesTopChart from './NotesTopChart.jsx';
 import EmptyState from './EmptyState.jsx';
 import LoadingSkeleton from './LoadingSkeleton.jsx';
 import CacheInfo from './CacheInfo.jsx';
@@ -41,11 +40,8 @@ const OverviewPage = () => {
   // Estado del componente
   const [data, setData] = useState(null);
   const [comparisonData, setComparisonData] = useState(null);
-  const [notesTopData, setNotesTopData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [notesTopLoading, setNotesTopLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [notesTopError, setNotesTopError] = useState(null);
 
   // Zustand store - observar cambios en filtros específicos
   const {
@@ -156,22 +152,13 @@ const OverviewPage = () => {
 
     const loadData = async () => {
       setLoading(true);
-      setNotesTopLoading(true);
       setError(null);
-      setNotesTopError(null);
 
       try {
         console.log('📊 Cargando datos con comparación y filtros:', filters);
 
-        // Cargar ambos tipos de datos en paralelo
-        const [overviewData, notesTopResponseData] = await Promise.all([
-          metricsService.fetchOverviewWithComparison(filters),
-          metricsService.fetchNotesTopWithComparison(filters).catch(err => {
-            console.warn('Error cargando notas top:', err);
-            setNotesTopError(err.message || 'Error cargando notas sensoriales');
-            return null;
-          })
-        ]);
+        // Cargar datos de overview
+        const overviewData = await metricsService.fetchOverviewWithComparison(filters);
 
         console.log('✅ Datos de overview cargados exitosamente:', {
           current: {
@@ -182,14 +169,6 @@ const OverviewPage = () => {
           deltas: overviewData.deltas
         });
 
-        if (notesTopResponseData) {
-          console.log('✅ Datos de notas top cargados exitosamente:', {
-            notes: notesTopResponseData.notes?.length,
-            sample: notesTopResponseData.sample
-          });
-          setNotesTopData(notesTopResponseData);
-        }
-
         setData(overviewData.current);
         setComparisonData(overviewData);
       } catch (err) {
@@ -197,7 +176,6 @@ const OverviewPage = () => {
         setError(err.message || 'Error cargando datos del dashboard');
       } finally {
         setLoading(false);
-        setNotesTopLoading(false);
       }
     };
 
@@ -263,53 +241,27 @@ const OverviewPage = () => {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', py: 3 }}>
-      <Container maxWidth="xl">
-        {/* Header del Dashboard */}
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            
-            <Box sx={{ display: 'flex', gap: 2, marginTop: 10, alignItems: 'center' }}>
-              <Chip 
-                icon={<Analytics />} 
-                label={`Período: ${timePeriod || 'mes'}`} 
-                color="primary" 
-                variant="outlined"
-              />
-              {loading && (
-                <Chip 
-                  label="Actualizando datos..." 
-                  color="warning" 
-                  size="small"
-                  variant="outlined"
-                />
-              )}
-              <Button
-                variant="outlined"
-                startIcon={<Refresh />}
-                onClick={handleRefresh}
-                disabled={loading}
-                size="small"
-              >
-                {loading ? 'Actualizando...' : 'Actualizar'}
-              </Button>
-            </Box>
-          </Box>
-          
-          <Divider />
-        </Box>
-
-        {/* Barra de filtros */}
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      bgcolor: 'background.default', 
+      py: { xs: 0.5, sm: 1, md: 2, lg: 3 }, 
+      overflowX: 'hidden',
+      width: '100%'
+    }}>
+      <Container 
+        maxWidth="xl" 
+        sx={{ 
+          px: { xs: 0.5, sm: 1, md: 2, lg: 3 },
+          width: '100%',
+          maxWidth: '100%'
+        }}
+      >
           <FiltersBar />
-        </Paper>
-
-        {/* Contenido principal con datos */}
         {data && !loading && (
           <>
-            {/* Fila 1: KPI Cards */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+            {/* Fila 1: KPI Cards - make cards stretch and share available space */}
+            <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 1, sm: 2, md: 3 } }} alignItems="stretch">
+              <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex' }}>
                 <MetricCard
                   title={`Usuarios con cata (${timePeriod || 'período'})`}
                   value={data.usersWithTasting30d}
@@ -319,11 +271,12 @@ const OverviewPage = () => {
                   trend={comparisonData?.deltas?.usersWithTasting30d ? formatDelta(comparisonData.deltas.usersWithTasting30d)?.trend : 'flat'}
                   loading={false}
                   color="primary"
+                  sx={{ flex: 1, width: '100%' }}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex' }}>
                 <MetricCard
-                  title="% Descubrimiento"
+                  title={`% Descubrimiento (${timePeriod || 'período'})`}
                   value={formatPercentage(data.discoveryRate)}
                   icon={<TrendingUp />}
                   hint="Porcentaje de usuarios que probaron nuevas yerbas"
@@ -331,9 +284,10 @@ const OverviewPage = () => {
                   trend={comparisonData?.deltas?.discoveryRatePp ? formatDeltaPp(comparisonData.deltas.discoveryRatePp)?.trend : 'flat'}
                   loading={false}
                   color="success"
+                  sx={{ flex: 1, width: '100%' }}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex' }}>
                 <MetricCard
                   title={`Eventos (${timePeriod || 'período'})`}
                   value={formatNumber(getTotalEvents(data))}
@@ -343,11 +297,12 @@ const OverviewPage = () => {
                   trend={comparisonData?.deltas?.eventsTotal ? formatDelta(comparisonData.deltas.eventsTotal)?.trend : 'flat'}
                   loading={false}
                   color="info"
+                  sx={{ flex: 1, width: '100%' }}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex' }}>
                 <MetricCard
-                  title="Usuarios Activos"
+                  title={`Usuarios Activos (${timePeriod || 'período'})`}
                   value={data.sample?.activeUsers || data.activeUsers || 0}
                   icon={<Analytics />}
                   hint={`Usuarios con actividad en el ${timePeriod || 'período'}`}
@@ -355,19 +310,40 @@ const OverviewPage = () => {
                   trend={comparisonData?.deltas?.activeUsers ? formatDelta(comparisonData.deltas.activeUsers)?.trend : 'flat'}
                   loading={false}
                   color="warning"
+                  sx={{ flex: 1, width: '100%' }}
                 />
               </Grid>
             </Grid>
 
             {/* Fila 2: Gráfico de tendencia temporal */}
-            <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+            <Paper sx={{ 
+              p: { xs: 1, sm: 2, md: 3 }, 
+              mb: { xs: 1, sm: 2, md: 3 }, 
+              borderRadius: 2, 
+              boxShadow: theme.shadows[1],
+              width: '100%'
+            }}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: { xs: 'flex-start', sm: 'center' }, 
+                mb: { xs: 1, sm: 2 }, 
+                flexWrap: 'wrap',
+                flexDirection: { xs: 'column', sm: 'row' },
+                gap: { xs: 0.5, sm: 0 }
+              }}>
                 <Box>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                    <Timeline sx={{ mr: 1, verticalAlign: 'middle' }} />
+                  <Typography variant="h6" sx={{ 
+                    fontWeight: 600, 
+                    color: 'text.primary',
+                    fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+                  }}>
+                    <Timeline sx={{ mr: 1, verticalAlign: 'middle', fontSize: { xs: 18, sm: 20, md: 24 } }} />
                     Actividad por Período
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" color="text.secondary" sx={{
+                    fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }
+                  }}>
                     {data.temporalActivity?.periodLabel || 'Evolución temporal de la actividad'}
                   </Typography>
                 </Box>
@@ -378,11 +354,16 @@ const OverviewPage = () => {
                     size="small"
                     variant="outlined"
                     color="secondary"
+                    sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
                   />
                 )}
               </Box>
               
-              <Box sx={{ height: 400, width: '100%' }}>
+              <Box sx={{ 
+                height: { xs: 200, sm: 250, md: 300, lg: 400 }, 
+                width: '100%',
+                overflow: 'hidden'
+              }}>
                 <TrendLineChart 
                   weeklyActivity={data.weeklyActivity || []} 
                   temporalActivity={data.temporalActivity || {}}
@@ -391,12 +372,33 @@ const OverviewPage = () => {
             </Paper>
 
             {/* Fila 3: Distribución por tipos y Top movers */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12, lg: 6 }}>
-                <Paper sx={{ p: 3, height: 450, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                    <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary' }}>
-                      <PieChart sx={{ mr: 1, verticalAlign: 'middle' }} />
+            {/* Forzar siempre apilamiento vertical y ancho completo */}
+            <Grid container spacing={{ xs: 1, sm: 2, md: 3 }} sx={{ mb: { xs: 1, sm: 2, md: 3 } }} direction="column">
+               {/* Hacer que cada elemento ocupe todo el ancho */}
+              <Grid item xs={12} sm={12} md={12}>
+                <Paper sx={{ 
+                  p: { xs: 1, sm: 2, md: 3 }, 
+                  height: { xs: 'auto', sm: 'auto', md: 400, lg: 450 }, 
+                  borderRadius: 2, 
+                  boxShadow: theme.shadows[1], 
+                  width: '100%', 
+                  overflow: 'hidden'
+                }}>
+                  <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: { xs: 'flex-start', sm: 'center' }, 
+                    mb: { xs: 1, sm: 2 }, 
+                    flexWrap: 'wrap',
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    gap: { xs: 0.5, sm: 0 }
+                  }}>
+                    <Typography variant="h6" sx={{ 
+                      fontWeight: 600, 
+                      color: 'text.primary',
+                      fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+                    }}>
+                      <PieChart sx={{ mr: 1, verticalAlign: 'middle', fontSize: { xs: 18, sm: 20, md: 24 } }} />
                       Distribución por Tipo de Yerba
                     </Typography>
                     {data.typeBreakdown?.[0]?.note && (
@@ -405,33 +407,46 @@ const OverviewPage = () => {
                         size="small"
                         color="warning"
                         variant="outlined"
+                        sx={{ fontSize: { xs: '0.7rem', sm: '0.8rem' } }}
                       />
                     )}
                   </Box>
-                  <StackedBarsChart typeBreakdown={data.typeBreakdown || []} />
+                  <Box sx={{ 
+                    width: '100%',
+                    height: { xs: 180, sm: 220, md: 300, lg: 350 },
+                    overflow: 'hidden'
+                  }}>
+                    <StackedBarsChart typeBreakdown={data.typeBreakdown || []} />
+                  </Box>
                 </Paper>
               </Grid>
               
-              <Grid size={{ xs: 12, lg: 6 }}>
-                <Paper sx={{ p: 3, height: 450, borderRadius: 2, boxShadow: theme.shadows[1] }}>
-                  <Typography variant="h6" sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}>
-                    <TrendingUp sx={{ mr: 1, verticalAlign: 'middle' }} />
-                    Principales Movimientos
-                  </Typography>
-                  <TopMoversTable topMovers={data.topMovers || []} />
-                </Paper>
-              </Grid>
-            </Grid>
-
-            {/* Fila 4: Notas sensoriales top del período */}
-            <Grid container spacing={3} sx={{ mb: 4 }}>
-              <Grid size={{ xs: 12 }}>
-                <NotesTopChart
-                  data={notesTopData}
-                  loading={notesTopLoading}
-                  error={notesTopError}
-                />
-              </Grid>
+              <Grid item xs={12} sm={12} md={12}>
+                <Paper sx={{ 
+                  p: { xs: 1, sm: 2, md: 3 }, 
+                  height: { xs: 'auto', sm: 'auto', md: 400, lg: 450 }, 
+                  borderRadius: 2, 
+                  boxShadow: theme.shadows[1], 
+                  width: '100%', 
+                  overflowX: 'auto'
+                }}>
+                   <Typography variant="h6" sx={{ 
+                     fontWeight: 600, 
+                     color: 'text.primary', 
+                     mb: { xs: 1, sm: 2 },
+                     fontSize: { xs: '1rem', sm: '1.1rem', md: '1.25rem' }
+                   }}>
+                     <TrendingUp sx={{ mr: 1, verticalAlign: 'middle', fontSize: { xs: 18, sm: 20, md: 24 } }} />
+                     Principales Movimientos
+                   </Typography>
+                   <Box sx={{ 
+                     width: '100%',
+                     overflow: 'auto'
+                   }}>
+                     <TopMoversTable topMovers={data.topMovers || []} />
+                   </Box>
+                 </Paper>
+               </Grid>
             </Grid>
           </>
         )}

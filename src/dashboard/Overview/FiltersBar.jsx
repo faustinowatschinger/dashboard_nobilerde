@@ -41,7 +41,6 @@ dayjs.locale('es');
 const FiltersBar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const [expanded, setExpanded] = useState(!isMobile);
 
   // Zustand store
@@ -102,11 +101,11 @@ const FiltersBar = () => {
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
+    <Paper sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: theme.shadows[2], marginTop: 10, marginBottom: 5 }}>
       {/* Header de filtros */}
       <Box 
         sx={{ 
-          p: 2, 
+          p: { xs: 1.5, sm: 2 }, 
           bgcolor: 'primary.main', 
           color: 'primary.contrastText',
           display: 'flex',
@@ -117,8 +116,11 @@ const FiltersBar = () => {
         onClick={() => setExpanded(!expanded)}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <FilterList />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          <FilterList sx={{ fontSize: { xs: 20, sm: 24 } }} />
+          <Typography variant="h6" sx={{ 
+            fontWeight: 700,
+            fontSize: { xs: '1rem', sm: '1.25rem' }
+          }}>
             Filtros
           </Typography>
           {activeFiltersCount > 0 && (
@@ -126,7 +128,7 @@ const FiltersBar = () => {
               label={activeFiltersCount} 
               size="small" 
               color="secondary" 
-              sx={{ ml: 1 }}
+              sx={{ ml: 1, fontWeight: 700 }}
             />
           )}
         </Box>
@@ -145,7 +147,12 @@ const FiltersBar = () => {
               sx={{ 
                 color: 'inherit', 
                 borderColor: 'rgba(255,255,255,0.5)',
-                '&:hover': { borderColor: 'inherit' }
+                '&:hover': { borderColor: 'inherit' },
+                borderRadius: 2,
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                px: { xs: 1, sm: 2 }
               }}
             >
               Limpiar
@@ -159,6 +166,7 @@ const FiltersBar = () => {
               e.stopPropagation();
               setExpanded(!expanded);
             }}
+            sx={{ bgcolor: 'transparent' }}
           >
             {expanded ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
@@ -167,62 +175,79 @@ const FiltersBar = () => {
 
       {/* Contenido de filtros */}
       <Collapse in={expanded}>
-        <Box sx={{ p: 3, bgcolor: 'background.paper' }}>
-          <Grid container spacing={3}>
+        <Box sx={{ p: { xs: 1.5, sm: 2, md: 3 }, bgcolor: 'background.paper', borderTop: `1px solid ${theme.palette.divider}` }}>
+          <Grid container spacing={{ xs: 2, sm: 3 }}>
             {/* Filtros de tiempo */}
-            <Grid xs={12}>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <DateRange color="primary" />
+            <Grid item xs={12}>
+              <Box sx={{ mb: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="subtitle1" sx={{ 
+                  fontWeight: 700, 
+                  mb: { xs: 1.5, sm: 2 }, 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: 1,
+                  fontSize: { xs: '0.9rem', sm: '1rem' }
+                }}>
+                  <DateRange color="primary" sx={{ fontSize: { xs: 18, sm: 20 } }} />
                   Período de Tiempo
                 </Typography>
                 
-                <Grid container spacing={2}>
-                  {/* Períodos predefinidos */}
-                  <Grid xs={12} sm={6} md={8}>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <Grid container spacing={{ xs: 1, sm: 2 }} alignItems="center">
+                  <Grid item xs={12} sm={8} md={8}>
+                    {/* Period buttons: always show labels; stacked as column on xs */}
+                    <Grid container spacing={{ xs: 0.5, sm: 1 }}>
                       {timePeriods.map((period) => (
-                        <Button
-                          key={period.value}
-                          variant={timePeriod === period.value ? 'contained' : 'outlined'}
-                          size="small"
-                          onClick={() => handleTimePeriodChange(period.value)}
-                          sx={{ 
-                            minWidth: 'auto',
-                            px: 2,
-                            py: 1,
-                            borderRadius: 2
-                          }}
-                        >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <span>{period.icon}</span>
-                            {!isSmallMobile && period.label}
-                          </Box>
-                        </Button>
+                        <Grid key={period.value} item xs={6} sm={6} md={3}>
+                          <Button
+                            variant={timePeriod === period.value ? 'contained' : 'outlined'}
+                            size="small"
+                            onClick={() => handleTimePeriodChange(period.value)}
+                            fullWidth
+                            sx={{ 
+                              px: { xs: 1, sm: 2 },
+                              py: { xs: 0.5, sm: 1 },
+                              borderRadius: 2,
+                              textTransform: 'none',
+                              fontWeight: 600,
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: { xs: 0.5, sm: 1 },
+                              fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' }
+                            }}
+                          >
+                            <Box component="span">{period.label}</Box>
+                          </Button>
+                        </Grid>
                       ))}
-                    </Box>
+                    </Grid>
                   </Grid>
 
                   {/* Fechas personalizadas */}
-                  <Grid xs={12} sm={6} md={4}>
+                  <Grid item xs={12} sm={4} md={4}>
                     <Button
                       variant={useCustomDates ? 'contained' : 'outlined'}
                       size="small"
                       onClick={() => setUseCustomDates(!useCustomDates)}
                       fullWidth
-                      sx={{ borderRadius: 2 }}
+                      sx={{ 
+                        borderRadius: 2, 
+                        textTransform: 'none', 
+                        fontWeight: 700,
+                        fontSize: { xs: '0.7rem', sm: '0.8rem', md: '0.875rem' },
+                        py: { xs: 0.5, sm: 1 }
+                      }}
                     >
-                      Fechas Personalizadas
+                      Fecha Personalizada
                     </Button>
                   </Grid>
                 </Grid>
 
                 {/* Selector de fechas personalizadas */}
                 {useCustomDates && (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                  <Box sx={{ mt: { xs: 1.5, sm: 2 }, p: { xs: 1.5, sm: 2 }, bgcolor: 'grey.50', borderRadius: 2 }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <Grid container spacing={2}>
-                        <Grid xs={12} sm={6}>
+                      <Grid container spacing={{ xs: 1, sm: 2 }}>
+                        <Grid item xs={12} sm={6}>
                           <DatePicker
                             label="Fecha de inicio"
                             value={dateRange.start ? dayjs(dateRange.start) : null}
@@ -236,7 +261,7 @@ const FiltersBar = () => {
                             }}
                           />
                         </Grid>
-                        <Grid xs={12} sm={6}>
+                        <Grid item xs={12} sm={6}>
                           <DatePicker
                             label="Fecha de fin"
                             value={dateRange.end ? dayjs(dateRange.end) : null}
@@ -256,13 +281,13 @@ const FiltersBar = () => {
                 )}
               </Box>
               
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={{ my: { xs: 1, sm: 2 } }} />
             </Grid>
             </Grid>
-        </Box>
-      </Collapse>
-    </Paper>
-  );
-};
-
-export default FiltersBar;
+         </Box>
+       </Collapse>
+     </Paper>
+   );
+ };
+ 
+ export default FiltersBar;

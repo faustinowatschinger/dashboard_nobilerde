@@ -12,11 +12,22 @@ import {
   ResponsiveContainer,
   Legend
 } from 'recharts';
-import { Box, Typography, useTheme, alpha } from '@mui/material';
+import { Box, Typography, useTheme, alpha, useMediaQuery } from '@mui/material';
 import dayjs from 'dayjs';
 
 const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Responsive values
+  const fontSize = isMobile ? 10 : isTablet ? 11 : 12;
+  const chartMargins = {
+    top: isMobile ? 12 : isTablet ? 16 : 20,
+    right: isMobile ? 12 : isTablet ? 16 : 20,
+    left: isMobile ? 4 : isTablet ? 6 : 8,
+    bottom: isMobile ? 8 : isTablet ? 10 : 12
+  };
 
   // Determinar qué datos usar y la granularidad
   const { data, granularity, periodLabel } = useMemo(() => {
@@ -91,12 +102,21 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             bgcolor: 'background.paper',
             border: `1px solid ${theme.palette.divider}`,
             borderRadius: 2,
-            p: 2,
+            p: { xs: 1, sm: 1.5, md: 2 },
             boxShadow: theme.shadows[4],
-            minWidth: 200
+            minWidth: { xs: 140, sm: 160, md: 220 },
+            maxWidth: { xs: 200, sm: 240, md: 320 }
           }}
         >
-          <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1, color: 'text.primary' }}>
+          <Typography 
+            variant="subtitle2" 
+            sx={{ 
+              fontWeight: 700, 
+              mb: 1, 
+              color: 'text.primary',
+              fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
+            }}
+          >
             {formatXAxis(label)}
           </Typography>
           
@@ -104,16 +124,30 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
               <Box
                 sx={{
-                  width: 12,
-                  height: 12,
+                  width: { xs: 8, sm: 10, md: 12 },
+                  height: { xs: 8, sm: 10, md: 12 },
                   borderRadius: '50%',
                   bgcolor: entry.color
                 }}
               />
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'text.secondary', 
+                  minWidth: { xs: 60, sm: 70, md: 80 },
+                  fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+                }}
+              >
                 {entry.name}:
               </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  fontWeight: 700, 
+                  color: 'text.primary',
+                  fontSize: { xs: '0.7rem', sm: '0.75rem', md: '0.875rem' }
+                }}
+              >
                 {entry.value}
               </Typography>
             </Box>
@@ -121,7 +155,11 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
           
           {data._debug && (
             <Box sx={{ mt: 1, pt: 1, borderTop: `1px solid ${theme.palette.divider}` }}>
-              <Typography variant="caption" color="text.disabled">
+              <Typography 
+                variant="caption" 
+                color="text.disabled"
+                sx={{ fontSize: { xs: '0.6rem', sm: '0.65rem', md: '0.75rem' } }}
+              >
                 Debug: {data._debug.granularity} - {data._debug.period}
               </Typography>
             </Box>
@@ -141,7 +179,7 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(theme.palette.background.paper, 0.5),
+          bgcolor: alpha(theme.palette.background.paper, 0.6),
           borderRadius: 2,
           border: `2px dashed ${theme.palette.divider}`
         }}
@@ -169,21 +207,31 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
   const useAreaChart = granularity === 'hour' || granularity === 'day';
 
   return (
-    <Box sx={{ height: '100%', width: '100%' }}>
+    <Box sx={{ 
+      height: '100%', 
+      width: '100%', 
+      px: { xs: 0, sm: 0.5, md: 1 },
+      py: { xs: 0, sm: 0.5 },
+      overflow: 'hidden',
+      minHeight: { xs: 180, sm: 220, md: 260, lg: 300 }
+    }}>
       {/* Debug info */}
       {console.log('📊 TrendLineChart - Datos recibidos:', { data, granularity, periodLabel })}
       
       <ResponsiveContainer width="100%" height="100%">
         {useAreaChart ? (
-          <AreaChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+          <AreaChart 
+            data={data} 
+            margin={chartMargins}
+          >
             <defs>
               <linearGradient id="colorEvents" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={chartColors.events} stopOpacity={0.8}/>
-                <stop offset="95%" stopColor={chartColors.events} stopOpacity={0.1}/>
+                <stop offset="95%" stopColor={chartColors.events} stopOpacity={0.06}/>
               </linearGradient>
               <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={chartColors.users} stopOpacity={0.8}/>
-                <stop offset="95%" stopColor={chartColors.users} stopOpacity={0.1}/>
+                <stop offset="95%" stopColor={chartColors.users} stopOpacity={0.06}/>
               </linearGradient>
             </defs>
             
@@ -196,13 +244,13 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             <XAxis
               dataKey="period"
               tickFormatter={formatXAxis}
-              tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
+              tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
               axisLine={{ stroke: theme.palette.divider }}
               tickLine={{ stroke: theme.palette.divider }}
             />
             
             <YAxis
-              tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
+              tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
               axisLine={{ stroke: theme.palette.divider }}
               tickLine={{ stroke: theme.palette.divider }}
               gridLine={{ stroke: alpha(theme.palette.divider, 0.3) }}
@@ -211,8 +259,9 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               wrapperStyle={{ 
-                paddingTop: 20,
-                fontSize: 12
+                paddingTop: isMobile ? 6 : isTablet ? 8 : 10,
+                fontSize: fontSize,
+                color: theme.palette.text.secondary
               }}
             />
             
@@ -241,7 +290,7 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             )}
           </AreaChart>
         ) : (
-          <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+          <LineChart data={data} margin={chartMargins}>
             <CartesianGrid 
               strokeDasharray="3 3" 
               stroke={alpha(theme.palette.divider, 0.5)}
@@ -251,13 +300,13 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             <XAxis
               dataKey="period"
               tickFormatter={formatXAxis}
-              tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
+              tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
               axisLine={{ stroke: theme.palette.divider }}
               tickLine={{ stroke: theme.palette.divider }}
             />
             
             <YAxis
-              tick={{ fontSize: 12, fill: theme.palette.text.secondary }}
+              tick={{ fontSize: fontSize, fill: theme.palette.text.secondary }}
               axisLine={{ stroke: theme.palette.divider }}
               tickLine={{ stroke: theme.palette.divider }}
               gridLine={{ stroke: alpha(theme.palette.divider, 0.3) }}
@@ -266,8 +315,9 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
             <Tooltip content={<CustomTooltip />} />
             <Legend 
               wrapperStyle={{ 
-                paddingTop: 20,
-                fontSize: 12
+                paddingTop: isMobile ? 6 : isTablet ? 8 : 10,
+                fontSize: fontSize,
+                color: theme.palette.text.secondary
               }}
             />
             
@@ -277,8 +327,8 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
                 dataKey="events"
                 stroke={chartColors.events}
                 strokeWidth={3}
-                dot={{ fill: chartColors.events, strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: chartColors.events, strokeWidth: 2 }}
+                dot={{ fill: chartColors.events, strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 5, stroke: chartColors.events, strokeWidth: 2 }}
                 name="Eventos"
               />
             )}
@@ -289,8 +339,8 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
                 dataKey="users"
                 stroke={chartColors.users}
                 strokeWidth={3}
-                dot={{ fill: chartColors.users, strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: chartColors.users, strokeWidth: 2 }}
+                dot={{ fill: chartColors.users, strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 5, stroke: chartColors.users, strokeWidth: 2 }}
                 name="Usuarios"
               />
             )}
@@ -301,8 +351,8 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
                 dataKey="yerbas"
                 stroke={chartColors.yerbas}
                 strokeWidth={3}
-                dot={{ fill: chartColors.yerbas, strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: chartColors.yerbas, strokeWidth: 2 }}
+                dot={{ fill: chartColors.yerbas, strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 5, stroke: chartColors.yerbas, strokeWidth: 2 }}
                 name="Yerbas"
               />
             )}
@@ -313,8 +363,8 @@ const TrendLineChart = ({ weeklyActivity = [], temporalActivity = {} }) => {
                 dataKey="catas"
                 stroke={chartColors.catas}
                 strokeWidth={3}
-                dot={{ fill: chartColors.catas, strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: chartColors.catas, strokeWidth: 2 }}
+                dot={{ fill: chartColors.catas, strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 5, stroke: chartColors.catas, strokeWidth: 2 }}
                 name="Catas"
               />
             )}
