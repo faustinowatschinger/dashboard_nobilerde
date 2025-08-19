@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './LandingPage.css';
+import NewsletterForm from '../components/NewsletterForm.jsx';
 
 export default function LandingPage() {
   return (
@@ -26,16 +27,10 @@ export default function LandingPage() {
         <section id="inicio" className="hero">
           <h1 className="hero__title">Encontrá la yerba mate perfecta para vos</h1>
           <p className="hero__subtitle">Nobilerde usa inteligencia artificial y la voz de miles de materos para recomendarte las mejores marcas según tu gusto.</p>
-          {/* Formulario de Newsletter (puedes migrar el JS a React si lo deseas) */}
+          {/* Formulario de Newsletter */}
           <div className="newsletter">
             <label className="newsletter__label" htmlFor="email-input">Recibí novedades antes que nadie</label>
-            <form className="newsletter__form" id="newsletter-form" action="#" method="POST">
-              <div className="newsletter__input-group">
-                <input type="email" id="email-input" className="newsletter__input" placeholder="tucorreo@ejemplo.com" required aria-describedby="email-help" />
-                <button type="submit" className="newsletter__button">Suscribirme</button>
-              </div>
-              <div id="email-help" className="newsletter__help">Te enviaremos un email de confirmación</div>
-            </form>
+            <NewsletterForm source="landing-hero" />
             <div className="privacy-notice">
               Tus datos se usan solo para enviarte novedades de Nobilerde. Podés darte de baja cuando quieras. <a href="privacidad.html">Ver política de privacidad</a>.
             </div>
