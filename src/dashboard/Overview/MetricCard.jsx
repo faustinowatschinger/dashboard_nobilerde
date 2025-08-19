@@ -100,7 +100,7 @@ const MetricCard = ({
           minHeight: { xs: 90, sm: 110, md: selectedSize.height }, 
           borderRadius: 2,
           boxShadow: theme.shadows[1],
-          bgcolor: 'background.paper'
+          bgcolor: theme.palette.common.white
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 1, sm: 2 } }}>
@@ -114,30 +114,29 @@ const MetricCard = ({
   }
 
   return (
-    <Paper 
-      sx={[
-        {
-          p: { xs: 1, sm: 2, md: 3 }, 
-          // Consolidated responsive minHeight to avoid duplicates
-          minHeight: { xs: 90, sm: 110, md: selectedSize.height }, 
-          borderRadius: 2,
-          boxShadow: theme.shadows[1],
-          bgcolor: 'background.paper',
-          border: `1px solid ${alpha(selectedColor.main, 0.08)}`,
-          background: `linear-gradient(180deg, ${alpha(selectedColor.light || selectedColor.main, 0.02)} 0%, transparent 60%)`,
-          transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: theme.shadows[6],
-            borderColor: alpha(selectedColor.main, 0.22)
-          },
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between'
-        },
-        sx
-      ]}
-    >
+    <Paper
+  sx={[
+    {
+      p: { xs: 1, sm: 2, md: 3 },
+      minHeight: { xs: 90, sm: 110, md: selectedSize.height },
+      borderRadius: 2,
+      boxShadow: theme.shadows[1],
+      bgcolor: theme.palette.common.white, // 🔥 fondo blanco sólido
+      border: `1px solid ${alpha(selectedColor.main, 0.08)}`,
+      transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: theme.shadows[6],
+        borderColor: alpha(selectedColor.main, 0.22),
+      },
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
+    sx,
+  ]}
+>
+
       {/* Header con icono y título */}
       <Box sx={{ display: 'flex', alignItems: 'center', mb: { xs: 0.5, sm: 1, md: 2 } }}>
         {icon && (

@@ -17,6 +17,7 @@ import {
   Chip,
   Tooltip,
   useMediaQuery,
+  Button
 } from '@mui/material';
 import {
   Dashboard,
@@ -197,6 +198,19 @@ const DashboardLayout = ({ children }) => {
              );
            })}
          </List>
+
+         {/* Botón para volver a la landing */}
+         <Box sx={{ p: 2, textAlign: 'center' }}>
+           <Button
+             variant="outlined"
+             color="primary"
+             fullWidth
+             onClick={() => navigate('/')}
+             sx={{ mt: 2 }}
+           >
+             Volver a la Landing
+           </Button>
+         </Box>
 
          {/* Footer del Sidebar */}
          <Box sx={{ mt: 'auto', p: 2 }}>

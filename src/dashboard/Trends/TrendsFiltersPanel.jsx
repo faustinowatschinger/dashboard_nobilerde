@@ -76,7 +76,7 @@ const TrendsFiltersPanel = () => {
             fontWeight: 600,
             fontSize: { xs: '1.1rem', sm: '1.25rem' }
           }}>
-            Filtros de Análisis
+            Filtros de Usuarios
           </Typography>
         </Box>
 

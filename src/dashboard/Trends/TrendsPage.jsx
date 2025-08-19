@@ -169,17 +169,7 @@ const TrendsPage = () => {
         maxWidth: '100%'
       }}
     >
-      {/* Barra de filtros temporales */}
-      <Paper sx={{ 
-        p: { xs: 2, sm: 3 }, 
-        mb: { xs: 2, sm: 3, md: 4 }, 
-        borderRadius: 2, 
-        marginTop: { xs: 8, sm: 9, md: 10 }, 
-        boxShadow: theme.shadows[1],
-        width: '100%'
-      }}>
         <FiltersBar />
-      </Paper>
 
       {/* Panel de filtros de análisis */}
       <Box sx={{ mb: { xs: 2, sm: 3, md: 4 } }}>

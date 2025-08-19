@@ -101,7 +101,7 @@ const FiltersBar = () => {
   const activeFiltersCount = getActiveFiltersCount();
 
   return (
-    <Paper sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: theme.shadows[2] }}>
+    <Paper sx={{ borderRadius: 2, overflow: 'hidden', boxShadow: theme.shadows[2], marginTop: 10, marginBottom: 5 }}>
       {/* Header de filtros */}
       <Box 
         sx={{ 

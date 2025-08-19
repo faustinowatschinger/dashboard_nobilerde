@@ -44,13 +44,6 @@ const YerbasPage = () => {
     useCustomDates
   } = useFiltersStore();
 
-  // Configuración de períodos de tiempo para mostrar la etiqueta actual
-  const timePeriods = [
-    { value: 'dia', label: 'Hoy' },
-    { value: 'semana', label: 'Últimos 7 días' },
-    { value: 'mes', label: 'Últimas 4 semanas' },
-    { value: 'año', label: 'Último año' }
-  ];
 
   // Efecto para recargar datos cuando cambian los filtros principales
   useEffect(() => {
@@ -103,13 +96,6 @@ const YerbasPage = () => {
     console.log('🕐 YerbasPage - TimePeriod cambió a:', timePeriod);
   }, [timePeriod]);
 
-  const getPeriodoLabel = () => {
-    if (useCustomDates) {
-      return 'Período personalizado';
-    }
-    const period = timePeriods.find(p => p.value === timePeriod);
-    return period ? period.label : 'Últimas 4 semanas';
-  };
 
   if (loading) {
     return (
@@ -174,6 +160,7 @@ const YerbasPage = () => {
         p: { xs: 2, sm: 3 }, 
         mb: { xs: 2, sm: 3 },
         width: '100%',
+        marginTop: 5,
         boxShadow: theme.shadows[1]
       }}>
         <Typography 

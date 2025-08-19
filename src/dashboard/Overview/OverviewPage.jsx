@@ -256,19 +256,7 @@ const OverviewPage = () => {
           maxWidth: '100%'
         }}
       >
-
-        {/* Barra de filtros */}
-        <Paper sx={{ 
-          p: { xs: 1, sm: 2, md: 3 }, 
-          mb: { xs: 1, sm: 2, md: 3 }, 
-          borderRadius: 2, 
-          boxShadow: theme.shadows[1],
-          width: '100%'
-        }}>
           <FiltersBar />
-        </Paper>
-
-        {/* Contenido principal con datos */}
         {data && !loading && (
           <>
             {/* Fila 1: KPI Cards - make cards stretch and share available space */}

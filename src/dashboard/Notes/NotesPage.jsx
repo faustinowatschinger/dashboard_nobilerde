@@ -27,13 +27,6 @@ const NotesPage = () => {
     useCustomDates
   } = useFiltersStore();
 
-  // Configuración de períodos de tiempo para mostrar la etiqueta
-  const timePeriods = [
-    { value: 'dia', label: 'Hoy', icon: '🌅' },
-    { value: 'semana', label: 'Últimos 7 días', icon: '📅' },
-    { value: 'mes', label: 'Últimas 4 semanas', icon: '📊' },
-    { value: 'año', label: 'Último año', icon: '📈' }
-  ];
 
   // Efecto para recargar datos cuando cambian los filtros
   useEffect(() => {
@@ -89,7 +82,7 @@ const NotesPage = () => {
       {/* Filtros de tiempo usando FiltersBar */}
       <FiltersBar />
       {/* Gráfico de comentarios top */}
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%', marginTop: 5 }}>
         <NotesTopChart 
           data={notesData} 
           loading={loading} 
